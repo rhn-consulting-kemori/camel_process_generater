@@ -1,0 +1,57 @@
+- route:
+    id: initial-process
+    from:
+      id: from-initial-process
+      description: 初期設定開始
+      uri: direct:initial-process
+      parameters: {}
+      steps:
+        - filter:
+            id: filter-blank
+            description: 空データ除去
+            expression:
+              simple:
+                expression: ${body} != null
+        - log:
+            id: log-recieve-message
+            message: "[Recieve Message] - ${body}"
+        - setProperty:
+            id: setProperty-process_request_json
+            description: RequestData設定(Json)
+            expression:
+              simple:
+                expression: ${body}
+            name: process_request_json
+        - unmarshal:
+            id: unmarshal-recieve-message
+            description: Json->Java変換
+            json:
+              unmarshalType: #recieve_message_entity_class#
+        - setProperty:
+            id: setProperty-process_request
+            description: RequestData設定
+            expression:
+              simple:
+                expression: ${body}
+            name: process_request
+        - setProperty:
+            id: setProperty-process_result
+            description: プロセス実行結果初期化
+            expression:
+              simple:
+                expression: "0"
+            name: process_result
+        - setProperty:
+            id: setProperty-err_code
+            description: エラーコード初期化
+            expression:
+              simple:
+                expression: ""
+            name: err_code
+        - setProperty:
+            id: setProperty-err_context
+            description: エラー理由初期化
+            expression:
+              simple:
+                expression: ""
+            name: err_context

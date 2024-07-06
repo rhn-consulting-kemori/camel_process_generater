@@ -1,0 +1,5 @@
+        - to:
+            id: to-#service_name#
+            description: #service_name_japanese#結果
+            uri: #to_end_point_uri#
+            parameters: {}

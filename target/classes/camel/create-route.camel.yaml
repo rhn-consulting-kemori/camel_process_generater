@@ -1,0 +1,36 @@
+- route:
+    id: route-process
+    from:
+      id: from-2073
+      description: ファイル読み込み
+      uri: file:data/input
+      parameters:
+        fileName: camel_create.json
+        jailStartingDirectory: false
+      steps:
+        - log:
+            id: log-2437
+            message: -- Read request Json -- ${body}
+        - unmarshal:
+            id: unmarshal-4035
+            json:
+              moduleClassNames: ""
+              unmarshalType: com.redhat.example.entity.CreateRouteJsonEntity
+        - setProperty:
+            id: setProperty-1019
+            expression:
+              simple:
+                expression: ${body}
+            name: create_route_json_entity
+        - bean:
+            id: bean-3894
+            method: createProcess
+            ref: createProcessRule
+        - to:
+            id: to-3592
+            uri: file:data/output
+            parameters:
+              fileName: result-route.camel.yaml
+        - log:
+            id: log-4056
+            message: -- Created Camel Route YAML --

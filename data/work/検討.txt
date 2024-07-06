@@ -1,0 +1,359 @@
+<Route Process>
+|START| 
+|フォーマットチェック| 
+|入金受付チェック|    
+|入金種類判定|
+|入金可能額試算|
+|入金充当額試算|
+|入金|
+|入金結果連携|
+|END|
+----------------------------------------------------------------
+- route:
+    id: route-process
+    from:
+      id: from-kafka-deposit
+      description: 調査部期日入金依頼
+      uri: kafka:{{app.input-topic-name}}
+      parameters: {}
+      steps:
+        - to:
+            id: to-initial-process
+            description: 開始業務
+            uri: direct:initial-process
+            parameters: {}
+        - to:
+            id: to-format-check
+            description: フォーマットチェック
+            uri: direct:format-check
+            parameters: {}
+        - to:
+            id: to-deposit-entry-check
+            description: 入金受付チェック
+            uri: direct:deposit-entry-check
+            parameters: {}
+        - to:
+            id: to-deposit-category
+            description: 入金種類判定
+            uri: direct:deposit-category
+            parameters: {}
+        - to:
+            id: to-check-available-deposit-amount
+            description: 入金可能額試算
+            uri: direct:check-available-deposit-amount
+            parameters: {}
+        - to:
+            id: to-deposit-allocation
+            description: 入金充当額試算
+            uri: direct:deposit-allocation
+            parameters: {}
+        - to:
+            id: to-deposit
+            description: 入金
+            uri: direct:deposit
+            parameters: {}
+        - to:
+            id: to-deposit-result-message
+            description: 入金結果連携
+            uri: direct:deposit-result-message
+            parameters: {}
+        - to:
+            id: to-kafka-deposit-end
+            description: 調査部期日入金結果
+            uri: kafka:{{app.output-topic-name}}
+            parameters: {}
+        - to:
+            id: to-finish-process
+            description: 完了業務
+            uri: direct:finish-process
+            parameters: {}
+
+----------------------------------------------------------------
+|START|
+#Yellow :調査部期日入金依頼;
+
+- route:
+    id: initial-process
+    from:
+      id: from-initial-process
+      description: 初期設定開始
+      uri: direct:initial-process
+      parameters: {}
+      steps:
+        - filter:
+            id: filter-blank
+            description: 空データ除去
+            expression:
+              simple:
+                expression: ${body} != null
+        - log:
+            id: log-recieve-message
+            message: "[Recieve Message] - ${body}"
+        - setProperty:
+            id: setProperty-deposit_request-json
+            description: RequestData設定(Json)
+            expression:
+              simple:
+                expression: ${body}
+            name: deposit_request_json
+        - unmarshal:
+            id: unmarshal-recieve-message
+            description: Json->Java変換
+            json:
+              unmarshalType: com.redhat.example.entity.KijitsuNyukinRequestEntity
+        - setProperty:
+            id: setProperty-deposit_request
+            description: RequestData設定
+            expression:
+              simple:
+                expression: ${body}
+            name: deposit_request
+        - setProperty:
+            id: setProperty-deposit_result
+            description: 入金結果初期化
+            expression:
+              simple:
+                expression: "0"
+            name: deposit_result
+        - setProperty:
+            id: setProperty-err_code
+            description: エラーコード初期化
+            expression:
+              simple:
+                expression: ""
+            name: err_code
+        - setProperty:
+            id: setProperty-err_context
+            description: エラー理由初期化
+            expression:
+              simple:
+                expression: ""
+            name: err_context
+
+----------------------------------------------------------------
+|フォーマットチェック|
+#Orange :期日入金入力チェックルール;
+
+- route:
+    id: format-check
+    from:
+      id: from-format-check
+      description: フォーマットチェック
+      uri: direct:format-check
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-format-check-rule-request
+            description: 依頼データ設定
+            expression:
+              simple:
+                expression: ${exchangeProperty.deposit_request}
+        - bean:
+            id: bean-format-check-rule
+            description: フォーマットチェックルール
+            method: executeRule
+            ref: formatCheckRule
+        - setProperty:
+            id: setProperty-format-check_response
+            description: 応答結果設定
+            expression:
+              simple:
+                expression: ${body}
+            name: format-check_response
+        - setProperty:
+            id: setProperty-format-check-deposit_result
+            description: 結果設定
+            expression:
+              simple:
+                expression: ${body.response_result}
+            name: deposit_result
+        - setProperty:
+            id: setProperty-format-check-err_code
+            description: エラーコード設定
+            expression:
+              simple:
+                expression: ${body.err_code}
+            name: err_code
+        - setProperty:
+            id: setProperty-format-check-err_context
+            description: エラー内容設定
+            expression:
+              simple:
+                expression: ${body.err_context}
+            name: err_context
+        - log:
+            id: log-format-check-complete
+            message: "[format-check] - (${exchangeProperty.deposit_request.request_id}) -
+              result: ${exchangeProperty.deposit_result} - err_code:
+              ${exchangeProperty.err_code} - err_context:
+              ${exchangeProperty.err_context}"
+
+----------------------------------------------------------------
+|入金受付チェック|
+#Yellow :入金受付チェック依頼;
+#Aqua :入金受付チェック;
+
+|入金種類判定|
+#Yellow :入金種類判定依頼;
+#Aqua :入金種類判定;
+
+|入金可能額試算|
+#Lightblue :入金可能額試算依頼;
+#Aqua :入金可能額試算;
+
+|入金充当額試算|
+#Yellow :入金充当額算出依頼;
+#Aqua :充当額算出;
+
+|入金|
+#Yellow :入金依頼;
+#Aqua :入金;
+
+|入金結果連携|
+#Orange :入金イベント設定ルール;
+
+|END|
+#Yellow :入金イベント;
+
+----------------------------------------------------------------
+[route-process]
+#service-name#, #service-name-japanese#, #from-end-point-uri#, #process-list[]#
+
+[process-direct]
+#process-name#, #service-name-japanese#
+
+[initial-process]
+#recieve-message-entity-class#
+
+[bean-route]
+#process-name#, #process-name-japanese#, #rule-class#, #rule-method#, #process-request-set-parameter#
+
+[api-route]
+#process-name#, #process-name-japanese#, #http-url#, #http-method#, #response-entity-class#, #business-data#, #process-request-set-parameter#
+
+[finish-route]
+-
+
+----------------------------------------------------------------
+#service-name#, #service-name-japanese#, #from-end-point-uri#, #recieve-message-entity-class#, #process-list[]#
+
+process-list[
+  process-type-data
+]
+
+process-type-data
+{#process-name#, #process-name-japanese#, #process-type#, #process-request-set-parameter#}
+
+bean-process-type-data
+{#process-name#, #process-name-japanese#, #process-type#, #process-request-set-parameter#, #rule-class#, #rule-method#}
+
+api-process-type-data
+{#process-name#, #process-name-japanese#, #process-type#, #process-request-set-parameter#, #http-url#, #http-method#, #response-entity-class#, #business-data#}
+----------------------------------------------------------------
+{
+  "service-name": "chosabu-kijitsu-deposit-service", 
+  "service-name-japanese": "調査部期日入金", 
+  "from-end-point-uri": "kafka:{{app.input-topic-name}}", 
+  "recieve-message-entity-class": "com.redhat.example.entity.KijitsuNyukinRequestEntity", 
+  "process-list": [
+    {
+      "process-name": "format-check", 
+      "process-name-japanese": "フォーマットチェック", 
+      "process-type": "bean", 
+      "process-request-set-parameter": "${exchangeProperty.process_request}", 
+      "rule-class": "formatCheckRule", 
+      "rule-method": "executeRule"
+    },
+    {
+      "process-name": "deposit-entry-check", 
+      "process-name-japanese": "入金受付チェック", 
+      "process-type": "api", 
+      "process-request-set-parameter": "
+        { 
+          \"request_id\": \"${exchangeProperty.deposit_request.request_id}\",
+          \"card_number\": \"${exchangeProperty.deposit_request.card_number}\",
+          \"customer_contract_number\": \"${exchangeProperty.deposit_request.customer_contract_number}\",
+          \"customer_billing_due_date\": \"${exchangeProperty.deposit_request.customer_billing_due_date}\",
+          \"contract_settlement_date\": \"${exchangeProperty.deposit_request.contract_settlement_date}\",
+          \"deposit_date\": \"${exchangeProperty.deposit_request.deposit_date}\",
+          \"deposit_amount\": ${exchangeProperty.deposit_request.deposit_amount},
+          \"excess_money_handling_category\": \"${exchangeProperty.deposit_request.excess_money_handling_category}\"
+        }", 
+      "http-url": "http://{{app.url-deposit-entry-check}}", 
+      "http-method": "POST", 
+      "response-entity-class": "com.redhat.example.type.DepositEntryCheckResponseType", 
+      "business-data": "response_result"
+    },
+    {
+      "process-name": "deposit-category", 
+      "process-name-japanese": "入金種類判定", 
+      "process-type": "api", 
+      "process-request-set-parameter": "
+        { 
+          \"request_id\": \"${exchangeProperty.deposit_request.request_id}\",
+          \"customer_contract_number\": \"${exchangeProperty.deposit_request.customer_contract_number}\",
+          \"customer_billing_due_date\": \"${exchangeProperty.deposit_request.customer_billing_due_date}\",
+          \"contract_settlement_date\":\"${exchangeProperty.deposit_request.contract_settlement_date}\",
+          \"deposit_date\":\"${exchangeProperty.deposit_request.deposit_date}\"
+        }", 
+      "http-url": "http://{{app.url-deposit-category}}", 
+      "http-method": "POST", 
+      "response-entity-class": "com.redhat.example.type.DepositCategoryResponseType", 
+      "business-data": "deposit_category_code"
+    },
+    {
+      "process-name": "check-available-deposit-amount", 
+      "process-name-japanese": "入金可能額試算", 
+      "process-type": "api", 
+      "process-request-set-parameter": "
+        { 
+          \"request_id\": \"${exchangeProperty.deposit_request.request_id}\",
+          \"customer_contract_number\":\"${exchangeProperty.deposit_request.customer_contract_number}\",
+          \"deposit_date\": \"${exchangeProperty.deposit_request.deposit_date}\",
+          \"customer_billing_due_date\": \"${exchangeProperty.deposit_request.customer_billing_due_date}\",
+          \"contract_settlement_date\": \"${exchangeProperty.deposit_request.contract_settlement_date}\",
+          \"deposit_category_code\": \"${exchangeProperty.deposit_category_code}\"
+        }", 
+      "http-url": "http://{{app.url-check-available-deposit-amount}}", 
+      "http-method": "POST", 
+      "response-entity-class": "com.redhat.example.type.CheckAvailableDepositAmountResponseType", 
+      "business-data": "deposit_available_amount_data"
+    },
+    {
+      "process-name": "deposit-allocation", 
+      "process-name-japanese": "入金充当額試算", 
+      "process-type": "api", 
+      "process-request-set-parameter": "", 
+      "http-url": "http://{{app.url-deposit-allocation}}", 
+      "http-method": "POST", 
+      "response-entity-class": "com.redhat.example.type.DepositAllocationResponseType", 
+      "business-data": "deposit_allocation_data"
+    },
+    {
+      "process-name": "deposit", 
+      "process-name-japanese": "入金", 
+      "process-type": "api", 
+      "process-request-set-parameter": "", 
+      "http-url": "http://http://{{app.url-deposit}}", 
+      "http-method": "POST", 
+      "response-entity-class": "com.redhat.example.type.DepositResponseType", 
+      "business-data": "deposit_data"
+    },
+    {
+      "process-name": "deposit-result-message", 
+      "process-name-japanese": "入金結果連携", 
+      "process-type": "bean", 
+      "process-request-set-parameter": "${exchangeProperty.process_request}", 
+      "rule-class": "depositResultMessageRule", 
+      "rule-method": "executeRule"
+    }
+  ]
+}
+
+|フォーマットチェック| 
+|入金受付チェック|
+|入金種類判定|
+|入金可能額試算|
+|入金充当額試算|
+|入金|
+|入金結果連携|

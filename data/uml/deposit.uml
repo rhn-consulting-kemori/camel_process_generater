@@ -1,0 +1,56 @@
+@startuml 調査部期日入金@chosabu-kijitsu-deposit-service
+|START|
+start
+#Yellow :調査部期日入金依頼;
+:kafka:{{app.input-topic-name}}
+KijitsuNyukinRequestEntity;
+|フォーマットチェック@format-check|
+#Orange :期日入金入力チェックルール;
+:process_request
+formatCheckRule
+executeRule;
+|入金受付チェック@deposit-entry-check|
+#Yellow :入金受付チェック依頼;
+#Aqua :入金受付チェック;
+:http://{{app.url-deposit-entry-check}}
+POST
+DepositEntryCheckResponseType
+response_result;
+|入金種類判定@deposit-category|
+#Yellow :入金種類判定依頼;
+#Aqua :入金種類判定;
+:http://{{app.url-deposit-category}}
+POST
+DepositCategoryResponseType
+deposit_category_code;
+|入金可能額試算@check-available-deposit-amount|
+#Lightblue :入金可能額試算依頼;
+#Aqua :入金可能額試算;
+:http://{{app.url-check-available-deposit-amount}}
+POST
+CheckAvailableDepositAmountResponseType
+deposit_available_amount_data;
+|入金充当額試算@deposit-allocation|
+#Yellow :入金充当額算出依頼;
+#Aqua :充当額算出;
+:http://{{app.url-deposit-allocation}}
+POST
+DepositAllocationResponseType
+deposit_allocation_data;
+|入金@deposit|
+#Yellow :入金依頼;
+#Aqua :入金;
+:http://http://{{app.url-deposit}} 
+POST
+DepositResponseType
+deposit_data;
+|入金結果連携@deposit-result-message|
+#Orange :入金イベント設定ルール;
+:process_request
+depositResultMessageRule
+executeRule;
+|END|
+#Yellow :入金イベント;
+:kafka:{{app.output-topic-name}};
+stop
+@enduml

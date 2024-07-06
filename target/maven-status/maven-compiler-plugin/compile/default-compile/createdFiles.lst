@@ -1,0 +1,4 @@
+com/redhat/example/CamelExampleApplication.class
+com/redhat/example/rule/CreateProcessRule.class
+com/redhat/example/entity/ProcessEntity.class
+com/redhat/example/entity/CreateRouteJsonEntity.class

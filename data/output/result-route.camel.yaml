@@ -1,0 +1,714 @@
+
+- route:
+    id: route-process
+    from:
+      id: from-chosabu-kijitsu-deposit-service
+      description: 調査部期日入金
+      uri: kafka:{{app.input-topic-name}}
+      parameters: {}
+      steps:
+        - to:
+            id: to-initial-process
+            description: 開始業務
+            uri: direct:initial-process
+            parameters: {}
+        - to:
+            id: to-format-check
+            description: フォーマットチェック
+            uri: direct:format-check
+            parameters: {}
+        - to:
+            id: to-deposit-entry-check
+            description: 入金受付チェック
+            uri: direct:deposit-entry-check
+            parameters: {}
+        - to:
+            id: to-deposit-category
+            description: 入金種類判定
+            uri: direct:deposit-category
+            parameters: {}
+        - to:
+            id: to-check-available-deposit-amount
+            description: 入金可能額試算
+            uri: direct:check-available-deposit-amount
+            parameters: {}
+        - to:
+            id: to-deposit-allocation
+            description: 入金充当額試算
+            uri: direct:deposit-allocation
+            parameters: {}
+        - to:
+            id: to-deposit
+            description: 入金
+            uri: direct:deposit
+            parameters: {}
+        - to:
+            id: to-deposit-result-message
+            description: 入金結果連携
+            uri: direct:deposit-result-message
+            parameters: {}
+        - to:
+            id: to-chosabu-kijitsu-deposit-service
+            description: 調査部期日入金結果
+            uri: kafka:{{app.output-topic-name}}
+            parameters: {}
+        - to:
+            id: to-finish-process
+            description: 完了業務
+            uri: direct:finish-process
+            parameters: {}
+- route:
+    id: initial-process
+    from:
+      id: from-initial-process
+      description: 初期設定開始
+      uri: direct:initial-process
+      parameters: {}
+      steps:
+        - filter:
+            id: filter-blank
+            description: 空データ除去
+            expression:
+              simple:
+                expression: ${body} != null
+        - log:
+            id: log-recieve-message
+            message: "[Recieve Message] - ${body}"
+        - setProperty:
+            id: setProperty-process_request_json
+            description: RequestData設定(Json)
+            expression:
+              simple:
+                expression: ${body}
+            name: process_request_json
+        - unmarshal:
+            id: unmarshal-recieve-message
+            description: Json->Java変換
+            json:
+              unmarshalType: com.redhat.example.entity.KijitsuNyukinRequestEntity
+        - setProperty:
+            id: setProperty-process_request
+            description: RequestData設定
+            expression:
+              simple:
+                expression: ${body}
+            name: process_request
+        - setProperty:
+            id: setProperty-process_result
+            description: プロセス実行結果初期化
+            expression:
+              simple:
+                expression: "0"
+            name: process_result
+        - setProperty:
+            id: setProperty-err_code
+            description: エラーコード初期化
+            expression:
+              simple:
+                expression: ""
+            name: err_code
+        - setProperty:
+            id: setProperty-err_context
+            description: エラー理由初期化
+            expression:
+              simple:
+                expression: ""
+            name: err_context
+
+- route:
+    id: format-check
+    from:
+      id: from-format-check
+      description: フォーマットチェック
+      uri: direct:format-check
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-format-check
+            otherwise:
+              id: otherwise-format-check
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-format-check-error-skipped
+                    message: "[format-check] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-format-check
+                description: エラーなし
+                steps:
+                  - to:
+                      id: to-format-check-setrequest
+                      description: フォーマットチェック要求設定
+                      uri: direct:format-check-setrequest
+                      parameters: {}
+                  - bean:
+                      id: bean-format-check-rule
+                      description: フォーマットチェックルール
+                      method: executeRule
+                      ref: formatCheckRule
+                  - setProperty:
+                      id: setProperty-format-check_response
+                      description: 応答結果設定
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: format-check_response
+                  - setProperty:
+                      id: setProperty-format-check-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-format-check-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-format-check-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - log:
+                      id: log-format-check-complete
+                      message: "[format-check] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0
+- route:
+    id: format-check-request
+    from:
+      id: from-format-check-request
+      description: フォーマットチェック要求設定
+      uri: direct:format-check-setrequest
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-format-check-setrequest
+            description: 依頼データ設定
+            expression:
+              simple:
+                expression: ${exchangeProperty.process_request}
+- route:
+    id: deposit-entry-check
+    from:
+      id: from-deposit-entry-check
+      description: 入金受付チェック
+      uri: direct:deposit-entry-check
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-deposit-entry-check
+            otherwise:
+              id: otherwise-deposit-entry-check
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-deposit-entry-check-error-skipped
+                    message: "[deposit-entry-check] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-deposit-entry-check
+                description: エラーなし
+                steps:
+                  - to:
+                      id: to-deposit-entry-check-setrequest
+                      description: 入金受付チェック要求設定
+                      uri: direct:deposit-entry-check-setrequest
+                      parameters: {}
+                  - to:
+                      id: to-deposit-entry-check-service
+                      description: 入金受付チェックサービス
+                      uri: http://{{app.url-deposit-entry-check}}
+                      parameters:
+                        httpMethod: POST
+                  - unmarshal:
+                      id: unmarshal-deposit-entry-check-response
+                      description: json->java変換
+                      json:
+                        unmarshalType: com.redhat.example.type.DepositEntryCheckResponseType
+                  - setProperty:
+                      id: setProperty-deposit-entry-check-response
+                      description: HTTP結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: response_result
+                  - setProperty:
+                      id: setProperty-deposit-entry-check-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-deposit-entry-check-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-deposit-entry-check-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - log:
+                      id: log-deposit-entry-check-complete
+                      message: "[deposit-entry-check] - (${exchangeProperty.process_request.request_id}) - done"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0
+- route:
+    id: deposit-entry-check-request
+    from:
+      id: from-deposit-entry-check-request
+      description: 入金受付チェック要求設定
+      uri: direct:deposit-entry-check-setrequest
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-deposit-entry-check-setrequest
+            description: 依頼データ設定
+            expression:
+              simple:
+                expression: 
+- route:
+    id: deposit-category
+    from:
+      id: from-deposit-category
+      description: 入金種類判定
+      uri: direct:deposit-category
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-deposit-category
+            otherwise:
+              id: otherwise-deposit-category
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-deposit-category-error-skipped
+                    message: "[deposit-category] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-deposit-category
+                description: エラーなし
+                steps:
+                  - to:
+                      id: to-deposit-category-setrequest
+                      description: 入金種類判定要求設定
+                      uri: direct:deposit-category-setrequest
+                      parameters: {}
+                  - to:
+                      id: to-deposit-category-service
+                      description: 入金種類判定サービス
+                      uri: http://{{app.url-deposit-category}}
+                      parameters:
+                        httpMethod: POST
+                  - unmarshal:
+                      id: unmarshal-deposit-category-response
+                      description: json->java変換
+                      json:
+                        unmarshalType: com.redhat.example.type.DepositCategoryResponseType
+                  - setProperty:
+                      id: setProperty-deposit-category-response
+                      description: HTTP結果設定
+                      expression:
+                        simple:
+                          expression: ${body.deposit_category_code}
+                      name: deposit_category_code
+                  - setProperty:
+                      id: setProperty-deposit-category-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-deposit-category-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-deposit-category-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - log:
+                      id: log-deposit-category-complete
+                      message: "[deposit-category] - (${exchangeProperty.process_request.request_id}) - done"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0
+- route:
+    id: deposit-category-request
+    from:
+      id: from-deposit-category-request
+      description: 入金種類判定要求設定
+      uri: direct:deposit-category-setrequest
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-deposit-category-setrequest
+            description: 依頼データ設定
+            expression:
+              simple:
+                expression: 
+- route:
+    id: check-available-deposit-amount
+    from:
+      id: from-check-available-deposit-amount
+      description: 入金可能額試算
+      uri: direct:check-available-deposit-amount
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-check-available-deposit-amount
+            otherwise:
+              id: otherwise-check-available-deposit-amount
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-check-available-deposit-amount-error-skipped
+                    message: "[check-available-deposit-amount] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-check-available-deposit-amount
+                description: エラーなし
+                steps:
+                  - to:
+                      id: to-check-available-deposit-amount-setrequest
+                      description: 入金可能額試算要求設定
+                      uri: direct:check-available-deposit-amount-setrequest
+                      parameters: {}
+                  - to:
+                      id: to-check-available-deposit-amount-service
+                      description: 入金可能額試算サービス
+                      uri: http://{{app.url-check-available-deposit-amount}}
+                      parameters:
+                        httpMethod: POST
+                  - unmarshal:
+                      id: unmarshal-check-available-deposit-amount-response
+                      description: json->java変換
+                      json:
+                        unmarshalType: com.redhat.example.type.CheckAvailableDepositAmountResponseType
+                  - setProperty:
+                      id: setProperty-check-available-deposit-amount-response
+                      description: HTTP結果設定
+                      expression:
+                        simple:
+                          expression: ${body.deposit_available_amount_data}
+                      name: deposit_available_amount_data
+                  - setProperty:
+                      id: setProperty-check-available-deposit-amount-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-check-available-deposit-amount-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-check-available-deposit-amount-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - log:
+                      id: log-check-available-deposit-amount-complete
+                      message: "[check-available-deposit-amount] - (${exchangeProperty.process_request.request_id}) - done"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0
+- route:
+    id: check-available-deposit-amount-request
+    from:
+      id: from-check-available-deposit-amount-request
+      description: 入金可能額試算要求設定
+      uri: direct:check-available-deposit-amount-setrequest
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-check-available-deposit-amount-setrequest
+            description: 依頼データ設定
+            expression:
+              simple:
+                expression: 
+- route:
+    id: deposit-allocation
+    from:
+      id: from-deposit-allocation
+      description: 入金充当額試算
+      uri: direct:deposit-allocation
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-deposit-allocation
+            otherwise:
+              id: otherwise-deposit-allocation
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-deposit-allocation-error-skipped
+                    message: "[deposit-allocation] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-deposit-allocation
+                description: エラーなし
+                steps:
+                  - to:
+                      id: to-deposit-allocation-setrequest
+                      description: 入金充当額試算要求設定
+                      uri: direct:deposit-allocation-setrequest
+                      parameters: {}
+                  - to:
+                      id: to-deposit-allocation-service
+                      description: 入金充当額試算サービス
+                      uri: http://{{app.url-deposit-allocation}}
+                      parameters:
+                        httpMethod: POST
+                  - unmarshal:
+                      id: unmarshal-deposit-allocation-response
+                      description: json->java変換
+                      json:
+                        unmarshalType: com.redhat.example.type.DepositAllocationResponseType
+                  - setProperty:
+                      id: setProperty-deposit-allocation-response
+                      description: HTTP結果設定
+                      expression:
+                        simple:
+                          expression: ${body.deposit_allocation_data}
+                      name: deposit_allocation_data
+                  - setProperty:
+                      id: setProperty-deposit-allocation-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-deposit-allocation-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-deposit-allocation-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - log:
+                      id: log-deposit-allocation-complete
+                      message: "[deposit-allocation] - (${exchangeProperty.process_request.request_id}) - done"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0
+- route:
+    id: deposit-allocation-request
+    from:
+      id: from-deposit-allocation-request
+      description: 入金充当額試算要求設定
+      uri: direct:deposit-allocation-setrequest
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-deposit-allocation-setrequest
+            description: 依頼データ設定
+            expression:
+              simple:
+                expression: 
+- route:
+    id: deposit
+    from:
+      id: from-deposit
+      description: 入金
+      uri: direct:deposit
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-deposit
+            otherwise:
+              id: otherwise-deposit
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-deposit-error-skipped
+                    message: "[deposit] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-deposit
+                description: エラーなし
+                steps:
+                  - to:
+                      id: to-deposit-setrequest
+                      description: 入金要求設定
+                      uri: direct:deposit-setrequest
+                      parameters: {}
+                  - to:
+                      id: to-deposit-service
+                      description: 入金サービス
+                      uri: http://http://{{app.url-deposit}}
+                      parameters:
+                        httpMethod: POST
+                  - unmarshal:
+                      id: unmarshal-deposit-response
+                      description: json->java変換
+                      json:
+                        unmarshalType: com.redhat.example.type.DepositResponseType
+                  - setProperty:
+                      id: setProperty-deposit-response
+                      description: HTTP結果設定
+                      expression:
+                        simple:
+                          expression: ${body.deposit_data}
+                      name: deposit_data
+                  - setProperty:
+                      id: setProperty-deposit-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-deposit-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-deposit-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - log:
+                      id: log-deposit-complete
+                      message: "[deposit] - (${exchangeProperty.process_request.request_id}) - done"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0
+- route:
+    id: deposit-request
+    from:
+      id: from-deposit-request
+      description: 入金要求設定
+      uri: direct:deposit-setrequest
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-deposit-setrequest
+            description: 依頼データ設定
+            expression:
+              simple:
+                expression: 
+- route:
+    id: deposit-result-message
+    from:
+      id: from-deposit-result-message
+      description: 入金結果連携
+      uri: direct:deposit-result-message
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-deposit-result-message
+            otherwise:
+              id: otherwise-deposit-result-message
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-deposit-result-message-error-skipped
+                    message: "[deposit-result-message] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-deposit-result-message
+                description: エラーなし
+                steps:
+                  - to:
+                      id: to-deposit-result-message-setrequest
+                      description: 入金結果連携要求設定
+                      uri: direct:deposit-result-message-setrequest
+                      parameters: {}
+                  - bean:
+                      id: bean-deposit-result-message-rule
+                      description: 入金結果連携ルール
+                      method: executeRule
+                      ref: depositResultMessageRule
+                  - setProperty:
+                      id: setProperty-deposit-result-message_response
+                      description: 応答結果設定
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: deposit-result-message_response
+                  - setProperty:
+                      id: setProperty-deposit-result-message-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-deposit-result-message-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-deposit-result-message-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - log:
+                      id: log-deposit-result-message-complete
+                      message: "[deposit-result-message] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0
+- route:
+    id: deposit-result-message-request
+    from:
+      id: from-deposit-result-message-request
+      description: 入金結果連携要求設定
+      uri: direct:deposit-result-message-setrequest
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-deposit-result-message-setrequest
+            description: 依頼データ設定
+            expression:
+              simple:
+                expression: ${exchangeProperty.process_request}
+- route:
+    id: finish-process
+    from:
+      id: from-finish-process
+      description: 完了業務
+      uri: direct:finish-process
+      parameters: {}
+      steps:
+        - log:
+            id: log-complete
+            message: "[Complete] - (${exchangeProperty.process_request.request_id})"
+        - log:
+            id: log-complete2
+            message: ---------------------------------------------------------------

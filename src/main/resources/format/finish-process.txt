@@ -1,0 +1,14 @@
+- route:
+    id: finish-process
+    from:
+      id: from-finish-process
+      description: 完了業務
+      uri: direct:finish-process
+      parameters: {}
+      steps:
+        - log:
+            id: log-complete
+            message: "[Complete] - (${exchangeProperty.process_request.request_id})"
+        - log:
+            id: log-complete2
+            message: ---------------------------------------------------------------
