@@ -1,5 +1,0 @@
-        - to:
-            id: to-#process_name#
-            description: #process_name_japanese#
-            uri: direct:#process_name#
-            parameters: {}
