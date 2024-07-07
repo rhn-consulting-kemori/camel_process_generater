@@ -1,56 +1,74 @@
 @startuml 調査部期日入金@chosabu-kijitsu-deposit-service
 |START|
 start
-#Yellow :調査部期日入金依頼;
-:kafka:{{app.input-topic-name}}
-KijitsuNyukinRequestEntity;
-|フォーマットチェック@format-check|
-#Orange :期日入金入力チェックルール;
-:process_request
-formatCheckRule
-executeRule;
-|入金受付チェック@deposit-entry-check|
-#Yellow :入金受付チェック依頼;
-#Aqua :入金受付チェック;
-:http://{{app.url-deposit-entry-check}}
-POST
-DepositEntryCheckResponseType
-response_result;
-|入金種類判定@deposit-category|
-#Yellow :入金種類判定依頼;
-#Aqua :入金種類判定;
-:http://{{app.url-deposit-category}}
-POST
-DepositCategoryResponseType
-deposit_category_code;
-|入金可能額試算@check-available-deposit-amount|
-#Lightblue :入金可能額試算依頼;
-#Aqua :入金可能額試算;
-:http://{{app.url-check-available-deposit-amount}}
-POST
-CheckAvailableDepositAmountResponseType
-deposit_available_amount_data;
-|入金充当額試算@deposit-allocation|
-#Yellow :入金充当額算出依頼;
-#Aqua :充当額算出;
-:http://{{app.url-deposit-allocation}}
-POST
-DepositAllocationResponseType
-deposit_allocation_data;
-|入金@deposit|
-#Yellow :入金依頼;
-#Aqua :入金;
-:http://http://{{app.url-deposit}} 
-POST
-DepositResponseType
-deposit_data;
-|入金結果連携@deposit-result-message|
-#Orange :入金イベント設定ルール;
-:process_request
-depositResultMessageRule
-executeRule;
+#Yellow :調査部期日入金依頼]
+note left
+# kafka:{{app.input-topic-name}}
+# KijitsuNyukinRequestEntity
+end note
+|フォーマットチェック\nformat-check|
+#Orange :期日入金入力チェックルール|
+note left
+# process_request
+# formatCheckRule
+# executeRule
+end note
+|入金受付チェック\ndeposit-entry-check|
+#Yellow :入金受付チェック依頼/
+#Aqua :入金受付チェック>
+note left
+# http://{{app.url-deposit-entry-check}}
+# POST
+# DepositEntryCheckResponseType
+# response_result
+end note
+|入金種類判定\ndeposit-category|
+#Yellow :入金種類判定依頼/
+#Aqua :入金種類判定>
+note left
+# http://{{app.url-deposit-category}}
+# POST
+# DepositCategoryResponseType
+# deposit_category_code
+end note
+|入金可能額試算\ncheck-available-deposit-amount|
+#Lightblue :入金可能額試算依頼/
+#Aqua :入金可能額試算>
+note left
+# http://{{app.url-check-available-deposit-amount}}
+# POST
+# CheckAvailableDepositAmountResponseType
+#deposit_available_amount_data
+end note
+|入金充当額試算\ndeposit-allocation|
+#Yellow :入金充当額算出依頼/
+#Aqua :充当額算出>
+note left
+# http://{{app.url-deposit-allocation}}
+# POST
+# DepositAllocationResponseType
+# deposit_allocation_data
+end note
+|入金\ndeposit|
+#Yellow :入金依頼/
+#Aqua :入金>
+note left
+# http://http://{{app.url-deposit}} 
+# POST
+# DepositResponseType
+# deposit_data
+end note
+|入金結果連携\ndeposit-result-message|
+#Orange :入金イベント設定ルール|
+note left
+# process_request
+# depositResultMessageRule
+# executeRule
+end note
 |END|
-#Yellow :入金イベント;
-:kafka:{{app.output-topic-name}};
+#Yellow :入金イベント]
+note left
+# kafka:{{app.output-topic-name}}
+end note
 stop
 @enduml
