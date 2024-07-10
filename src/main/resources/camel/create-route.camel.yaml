@@ -1,5 +1,5 @@
 - route:
-    id: route-process
+    id: route-json-process
     from:
       id: from-2073
       description: ファイル読み込み
@@ -34,3 +34,26 @@
         - log:
             id: log-4056
             message: -- Created Camel Route YAML --
+- route:
+    id: route-uml-process
+    from:
+      id: from-4065
+      description: UML読込み
+      uri: file:data/input
+      parameters:
+        fileName: activity.uml
+      steps:
+        - log:
+            id: log-2172
+            description: UMLログ出力
+            message: Read UML=${body}
+        - to:
+            id: to-3971
+            description: Json-Parameter変換
+            uri: bean:createJsonParameterRule
+            parameters:
+              method: createJsonParameter
+        - log:
+            id: log-1632
+            description: JSONログ出力
+            message: Create Json = ${body}
