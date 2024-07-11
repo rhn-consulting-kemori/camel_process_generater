@@ -193,7 +193,7 @@
             description: 依頼データ設定
             expression:
               simple:
-                expression: ${exchangeProperty.process_request}
+                expression: '${exchangeProperty.process_request}'
 - route:
     id: deposit-entry-check
     from:
@@ -230,7 +230,7 @@
                       id: unmarshal-deposit-entry-check-response
                       description: json->java変換
                       json:
-                        unmarshalType: com.redhat.example.type.DepositEntryCheckResponseType
+                        unmarshalType: depositEntryCheckResponseType
                   - setProperty:
                       id: setProperty-deposit-entry-check-response
                       description: HTTP結果設定
@@ -278,7 +278,7 @@
             description: 依頼データ設定
             expression:
               simple:
-                expression: 
+                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","card_number":"${exchangeProperty.process_request.card_number}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_date":"${exchangeProperty.process_request.deposit_date}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}"}'
 - route:
     id: deposit-category
     from:
@@ -315,7 +315,7 @@
                       id: unmarshal-deposit-category-response
                       description: json->java変換
                       json:
-                        unmarshalType: com.redhat.example.type.DepositCategoryResponseType
+                        unmarshalType: depositCategoryResponseType
                   - setProperty:
                       id: setProperty-deposit-category-response
                       description: HTTP結果設定
@@ -363,7 +363,7 @@
             description: 依頼データ設定
             expression:
               simple:
-                expression: 
+                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_date":"${exchangeProperty.process_request.deposit_date}"}'
 - route:
     id: check-available-deposit-amount
     from:
@@ -400,7 +400,7 @@
                       id: unmarshal-check-available-deposit-amount-response
                       description: json->java変換
                       json:
-                        unmarshalType: com.redhat.example.type.CheckAvailableDepositAmountResponseType
+                        unmarshalType: checkAvailableDepositAmountResponseType
                   - setProperty:
                       id: setProperty-check-available-deposit-amount-response
                       description: HTTP結果設定
@@ -448,7 +448,7 @@
             description: 依頼データ設定
             expression:
               simple:
-                expression: 
+                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}"}'
 - route:
     id: deposit-allocation
     from:
@@ -485,7 +485,7 @@
                       id: unmarshal-deposit-allocation-response
                       description: json->java変換
                       json:
-                        unmarshalType: com.redhat.example.type.DepositAllocationResponseType
+                        unmarshalType: depositAllocationResponseType
                   - setProperty:
                       id: setProperty-deposit-allocation-response
                       description: HTTP結果設定
@@ -533,7 +533,7 @@
             description: 依頼データ設定
             expression:
               simple:
-                expression: 
+                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}","deposit_available_amount_data":${exchangeProperty.deposit_available_amount_data_json}}'
 - route:
     id: deposit
     from:
@@ -563,14 +563,14 @@
                   - to:
                       id: to-deposit-service
                       description: 入金サービス
-                      uri: http://http://{{app.url-deposit}}
+                      uri: http://{{app.url-deposit}}
                       parameters:
                         httpMethod: POST
                   - unmarshal:
                       id: unmarshal-deposit-response
                       description: json->java変換
                       json:
-                        unmarshalType: com.redhat.example.type.DepositResponseType
+                        unmarshalType: depositResponseType
                   - setProperty:
                       id: setProperty-deposit-response
                       description: HTTP結果設定
@@ -618,7 +618,7 @@
             description: 依頼データ設定
             expression:
               simple:
-                expression: 
+                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}","deposit_allocation_data":${exchangeProperty.deposit_allocation_data_json}}'
 - route:
     id: deposit-result-message
     from:
@@ -697,7 +697,7 @@
             description: 依頼データ設定
             expression:
               simple:
-                expression: ${exchangeProperty.process_request}
+                expression: '{"deposit_request":${exchangeProperty.process_request_json},"deposit_result":"${exchangeProperty.process_request}","err_code":"${exchangeProperty.err_code}","err_context":"${exchangeProperty.err_context}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_data":${exchangeProperty.deposit_data_json}}'
 - route:
     id: finish-process
     from:

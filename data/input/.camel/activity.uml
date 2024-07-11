@@ -13,23 +13,24 @@ end note
 note left
 * KijitsuNyukinRequestEntity
 end note
-|フォーマットチェック\nformat-check|
-#Yellow :期日入金入力チェック依頼/
+|フォーマットチェック@format-check|
+#Lime :期日入金入力チェック依頼/
 note left
 * KijitsuNyukinRequestEntity
-* ${exchangeProperty.process_request}
+${exchangeProperty.process_request}
 end note
 #Orange :期日入金入力チェックルール|
 note left
 * formatCheckRule
 * executeRule
 end note
-#Yellow :期日入金入力チェック結果/
+#GreenYellow :期日入金入力チェック結果/
 note left
 * FormatCheckResponseType
+* 
 end note
-|入金受付チェック\ndeposit-entry-check|
-#Yellow :入金受付チェック依頼/
+|入金受付チェック@deposit-entry-check|
+#Lime :入金受付チェック依頼/
 note left
 * DepositEntryCheckRequestType
 {
@@ -56,13 +57,13 @@ note left
 * http://{{app.url-deposit-entry-check}}
 * POST
 end note
-#Yellow :入金受付チェック結果/
+#GreenYellow :入金受付チェック結果/
 note left
 * DepositEntryCheckResponseType
 * response_result
 end note
-|入金種類判定\ndeposit-category|
-#Yellow :入金種類判定依頼/
+|入金種類判定@deposit-category|
+#Lime :入金種類判定依頼/
 note left
 * DepositCategoryRequestType
 {
@@ -83,13 +84,13 @@ note left
 * http://{{app.url-deposit-category}}
 * POST
 end note
-#Yellow :入金種類判定結果/
+#GreenYellow :入金種類判定結果/
 note left
 * DepositCategoryResponseType
 * deposit_category_code
 end note
-|入金可能額試算\ncheck-available-deposit-amount|
-#Lightblue :入金可能額試算依頼/
+|入金可能額試算@check-available-deposit-amount|
+#Lime :入金可能額試算依頼/
 note left
 * CheckAvailableDepositAmountRequestType
 {
@@ -112,13 +113,13 @@ note left
 * http://{{app.url-check-available-deposit-amount}}
 * POST
 end note
-#Lightblue :入金可能額試算結果/
+#GreenYellow :入金可能額試算結果/
 note left
 * CheckAvailableDepositAmountResponseType
 * deposit_available_amount_data
 end note
-|入金充当額試算\ndeposit-allocation|
-#Yellow :入金充当額算出依頼/
+|入金充当額試算@deposit-allocation|
+#Lime :入金充当額算出依頼/
 note left
 * DepositAllocationRequestType
 {
@@ -147,13 +148,13 @@ note left
 * http://{{app.url-deposit-allocation}}
 * POST
 end note
-#Yellow :入金充当額算出結果/
+#GreenYellow :入金充当額算出結果/
 note left
 * DepositAllocationResponseType
 * deposit_allocation_data
 end note
-|入金\ndeposit|
-#Yellow :入金依頼/
+|入金@deposit|
+#Lime :入金依頼/
 note left
 * DepositRequestType
 {
@@ -182,13 +183,13 @@ note left
 * http://{{app.url-deposit}} 
 * POST
 end note
-#Yellow :入金結果/
+#GreenYellow :入金結果/
 note left
 * DepositResponseType
 * deposit_data
 end note
-|入金結果連携\ndeposit-result-message|
-#Yellow :入金結果連携依頼/
+|入金結果連携@deposit-result-message|
+#Lime :入金結果連携依頼/
 note left
 * DepositResultMessageRequestType
 {
@@ -211,9 +212,10 @@ note left
 * depositResultMessageRule
 * executeRule
 end note
-#Yellow :入金結果連携結果/
+#GreenYellow :入金結果連携結果/
 note left
 * DepositResultMessageResponseType
+* 
 end note
 |END|
 #Yellow :入金イベント]

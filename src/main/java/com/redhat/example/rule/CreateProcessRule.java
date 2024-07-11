@@ -150,7 +150,7 @@ public class CreateProcessRule {
         String processString = 
             format.replace("#process_name#", process_entity.getProcess_name())
             .replace("#process_name_japanese#", process_entity.getProcess_name_japanese())
-            .replace("#process_request_set_parameter#", process_entity.getProcess_request_set_parameter())
+            .replace("#process_request_set_parameter#", "'" + process_entity.getProcess_request_set_parameter() + "'")
             .replace("#rule_class#", process_entity.getRule_class())
             .replace("#rule_method#", process_entity.getRule_method());
 
@@ -162,7 +162,7 @@ public class CreateProcessRule {
         String processString = 
             format.replace("#process_name#", process_entity.getProcess_name())
             .replace("#process_name_japanese#", process_entity.getProcess_name_japanese())
-            .replace("#process_request_set_parameter#", process_entity.getProcess_request_set_parameter())
+            .replace("#process_request_set_parameter#", "'" + process_entity.getProcess_request_set_parameter() + "'")
             .replace("#http_url#", process_entity.getHttp_url())
             .replace("#http_method#", process_entity.getHttp_method())
             .replace("#response_entity_class#", process_entity.getResponse_entity_class())
