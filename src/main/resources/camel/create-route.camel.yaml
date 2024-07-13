@@ -1,16 +1,43 @@
 - route:
-    id: route-uml-process
+    id: route-process
     from:
-      id: from-4065
+      id: from-UML
       description: UML読込み
       uri: file:data/input
       parameters:
         fileName: activity.uml
       steps:
         - log:
-            id: log-2172
-            description: UMLログ出力
-            message: Read UML=${body}
+            id: log-Read
+            description: Start Log
+            message: -- [Start] -- Read UML
+        - to:
+            id: to-convert-uml-to-json
+            description: UmlからJson変換
+            uri: direct:uml-to-json
+            parameters: {}
+        - to:
+            id: to-create-camel-route
+            description: Camel Route 作成
+            uri: direct:create-camel-route
+            parameters: {}
+        - to:
+            id: to-create-app-yml
+            description: application-yaml作成
+            uri: direct:create-app-yml
+            parameters: {}
+        - log:
+            id: log-Complete
+            description: Complete Log
+            message: -- [Complite] -- Created Camel Route YAML
+- route:
+    id: route-uml-to-json
+    from:
+      id: from-uml-to-json
+      description: Convert Uml to Json
+      uri: direct:uml-to-json
+      parameters: {}
+      steps:
         - to:
             id: to-3971
             description: Json-Parameter変換
@@ -29,27 +56,61 @@
         - to:
             id: to-2087
             description: Json出力
-            uri: file:data/output
+            uri: file:data/output/json
             parameters:
               fileName: camel_create.json
+        - log:
+            id: log-3503
+            message: -- [Convert UML to JSON] --
+- route:
+    id: route-create-camel-route
+    from:
+      id: from-create-camel-route
+      description: Camel Route作成
+      uri: direct:create-camel-route
+      parameters: {}
+      steps:
         - setBody:
             id: setBody-8040
             expression:
               simple:
                 expression: ${exchangeProperty.create_route_json_entity}
-        - log:
-            id: log-2110
-            message: ${body}
         - bean:
-            id: bean-3894
+            id: bean-camel-route
             description: Camel Route作成
             method: createProcess
             ref: createProcessRule
         - to:
-            id: to-3592
-            uri: file:data/output
+            id: to-file-camel-route
+            uri: file:data/output/yaml
             parameters:
               fileName: result-route.camel.yaml
         - log:
-            id: log-4056
-            message: -- Created Camel Route YAML --
+            id: log-camel-route
+            message: -- [Create Camel Route] --
+- route:
+    id: route-create-app-yml
+    from:
+      id: from-create-app-yml
+      description: Camel Route作成
+      uri: direct:create-app-yml
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-create-app-yml
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - bean:
+            id: bean-create-app-yml
+            description: Application-yml作成
+            method: createAppYml
+            ref: createApplicationYml
+        - to:
+            id: to-file-app-yml
+            uri: file:data/output/yaml
+            parameters:
+              fileName: application.yaml
+        - log:
+            id: log-create-app-yml
+            message: -- [Create Application YML] --
