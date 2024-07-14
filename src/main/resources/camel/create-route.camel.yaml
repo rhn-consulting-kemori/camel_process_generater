@@ -114,3 +114,53 @@
         - log:
             id: log-create-app-yml
             message: -- [Create Application YML] --
+- route:
+    id: route-class-yml
+    from:
+      id: from-file-class-yaml
+      description: Class YAML読み込み
+      uri: file:data/input
+      parameters:
+        fileName: business_object.yml
+      steps:
+        - to:
+            id: to-1094
+            uri: bean:createPopJClassRule
+            parameters:
+              method: createYamlClass
+        - split:
+            id: split-3801
+            steps:
+              - setProperty:
+                  id: setProperty-className
+                  expression:
+                    simple:
+                      expression: ${body.className}
+                  name: popj_class_name
+              - setProperty:
+                  id: setProperty-packageName
+                  expression:
+                    simple:
+                      expression: ${body.packageName}
+                  name: popj_package_name
+              - setProperty:
+                  id: setProperty-2857
+                  expression:
+                    simple:
+                      expression: ${body.javaCode}
+                  name: popj_java_code
+              - setBody:
+                  id: setBody-3725
+                  expression:
+                    simple:
+                      expression: ${exchangeProperty.popj_java_code}
+              - to:
+                  id: to-2095
+                  uri: file:data/output/src/main/java
+                  parameters:
+                    fileName: ${exchangeProperty.popj_package_name}/${exchangeProperty.popj_class_name}.java
+            expression:
+              simple: ${body}
+        - log:
+            id: log-5789
+            message: --  [Complete create Class] --

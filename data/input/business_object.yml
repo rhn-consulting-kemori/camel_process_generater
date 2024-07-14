@@ -1,0 +1,737 @@
+classes:
+  - 
+    name: KijitsuNyukinRequestEntity
+    description: 期日入金要求
+    packages: com.redhat.example.entity
+    import_list:
+      - com.fasterxml.jackson.annotation.JsonIgnoreProperties
+      - com.fasterxml.jackson.annotation.JsonProperty
+      - lombok.Data
+      - java.math.BigDecimal
+    annotations:
+      - Data
+      - JsonIgnoreProperties(ignoreUnknown = true)
+    properties:
+      - 
+        name: request_id
+        type: String
+        description: 入金要求番号
+        annotations:
+          - JsonProperty(value = "REQUEST_ID")
+      - 
+        name: card_number
+        type: String
+        description: カード番号
+        annotations:
+          - JsonProperty(value = "CARD_NUMBER")
+      - 
+        name: customer_contract_number
+        type: String
+        description: 顧客契約番号
+        annotations:
+          - JsonProperty(value = "CUSTOMER_CONTRACT_NUMBER")
+      - 
+        name: customer_billing_due_date
+        type: String
+        description: 顧客請求締年月日
+        annotations:
+          - JsonProperty(value = "CUSTOMER_BILLING_DUE_DATE")
+      - 
+        name: contract_settlement_date
+        type: String
+        description: 約定決済年月日
+        annotations:
+          - JsonProperty(value = "CONTRACT_SETTLEMENT_DATE")
+      - 
+        name: deposit_date
+        type: String
+        description: 入金年月日
+        annotations:
+          - JsonProperty(value = "DEPOSIT_DATE")
+      - 
+        name: deposit_amount
+        type: BigDecimal
+        description: 入金額
+        annotations: 
+          - JsonProperty(value = "DEPOSIT_AMOUNT")
+      - 
+        name: excess_money_handling_category
+        type: String
+        description: 過剰金取扱区分
+        annotations:
+          - JsonProperty(value = "EXCESS_MONEY_HANDLING_CATEGORY")
+  - 
+    name: KijitsuNyukinResponseEntity
+    description: 期日入金応答
+    packages: com.redhat.example.entity
+    import_list:
+      - lombok.Data
+      - java.math.BigDecimal
+      - org.springframework.stereotype.Component
+      - com.redhat.example.entity.SaikenCompositeUnitEntity
+      - com.redhat.example.entity.SeikyuCompositeUnitEntity
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: deposit_request
+        type: KijitsuNyukinRequestEntity
+        description: 期日入金要求
+        annotations: 
+      - 
+        name: deposit_result
+        type: String
+        description: 入金結果
+        annotations: 
+      - 
+        name: err_code
+        type: String
+        description: エラーコード
+        annotations: 
+      - 
+        name: err_context
+        type: String
+        description: エラー理由
+        annotations: 
+      - 
+        name: deposit_category_code
+        type: String
+        description: 入金種類区分
+        annotations: 
+      - 
+        name: deposit_allocation_amount
+        type: SaikenCompositeUnitEntity
+        description: 入金充当額
+        annotations: 
+      - 
+        name: excess_money
+        type: BigDecimal
+        description: 過剰金
+        annotations: 
+      - 
+        name: jeccs_deposit
+        type: BigDecimal
+        description: JECCS預り金
+        annotations: 
+      - 
+        name: estimated_billing_amount
+        type: SeikyuCompositeUnitEntity
+        description: 残請求予定額
+        annotations: 
+      - 
+        name: balance_amount
+        type: SaikenCompositeUnitEntity
+        description: 残高
+        annotations: 
+  - 
+    name: FormatCheckResponseType
+    description: フォーマットチェック応答
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: response_result
+        type: String
+        description: 結果
+        annotations: 
+      - 
+        name: err_code
+        type: String
+        description: エラーコード
+        annotations: 
+      - 
+        name: err_context
+        type: String
+        description: エラー内容
+        annotations: 
+  - 
+    name: DepositEntryCheckRequestType
+    description: 入金受付チェック要求
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - java.math.BigDecimal
+      - org.springframework.stereotype.Component
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: request_id
+        type: String
+        description: 入金要求番号
+        annotations:
+      - 
+        name: card_number
+        type: String
+        description: カード番号
+        annotations:
+      - 
+        name: customer_contract_number
+        type: String
+        description: 顧客契約番号
+        annotations:
+      - 
+        name: customer_billing_due_date
+        type: String
+        description: 顧客請求締年月日
+        annotations:
+      - 
+        name: contract_settlement_date
+        type: String
+        description: 約定決済年月日
+        annotations:
+      - 
+        name: deposit_date
+        type: String
+        description: 入金年月日
+        annotations:
+      - 
+        name: deposit_amount
+        type: BigDecimal
+        description: 入金額
+        annotations: 
+      - 
+        name: excess_money_handling_category
+        type: String
+        description: 過剰金取扱区分
+        annotations:
+  - 
+    name: DepositEntryCheckResponseType
+    description: 入金受付チェック応答
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: service_request
+        type: DepositEntryCheckRequestType
+        description: 入金受付チェック要求
+        annotations:
+      - 
+        name: response_result
+        type: String
+        description: 結果
+        annotations: 
+      - 
+        name: err_code
+        type: String
+        description: エラーコード
+        annotations: 
+      -   
+        name: err_context
+        type: String
+        description: エラー内容
+        annotations: 
+  - 
+    name: DepositCategoryRequestType
+    description: 入金種類区分要求
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: request_id
+        type: String
+        description: 入金要求番号
+        annotations:
+      - 
+        name: customer_contract_number
+        type: String
+        description: 顧客契約番号
+        annotations:
+      - 
+        name: customer_billing_due_date
+        type: String
+        description: 顧客請求締年月日
+        annotations:
+      - 
+        name: contract_settlement_date
+        type: String
+        description: 約定決済年月日
+        annotations:
+      - 
+        name: deposit_date
+        type: String
+        description: 入金年月日
+        annotations:
+  - 
+    name: DepositCategoryResponseType
+    description: 入金種類区分応答
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: service_request
+        type: DepositCategoryRequestType
+        description: 入金種類区分要求
+        annotations: 
+      - 
+        name: response_result
+        type: String
+        description: 結果
+        annotations: 
+      - 
+        name: err_code
+        type: String
+        description: エラーコード
+        annotations: 
+      - 
+        name: err_context
+        type: String
+        description: エラー内容
+        annotations: 
+      - 
+        name: deposit_category_code
+        type: String
+        description: 入金種類区分
+        annotations: 
+  - 
+    name: CheckAvailableDepositAmountRequestType
+    description: 入金可能額要求
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: request_id
+        type: String
+        description: 入金要求番号
+        annotations:
+      - 
+        name: customer_contract_number
+        type: String
+        description: 顧客契約番号
+        annotations:
+      - 
+        name: deposit_date
+        type: String
+        description: 入金年月日
+        annotations:
+      - 
+        name: customer_billing_due_date
+        type: String
+        description: 顧客請求締年月日
+        annotations:
+      - 
+        name: contract_settlement_date
+        type: String
+        description: 約定決済年月日
+        annotations:
+      - 
+        name: deposit_category_code
+        type: String
+        description: 入金種類区分
+        annotations: 
+  - 
+    name: CheckAvailableDepositAmountResponseType
+    description: 入金可能額応答
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+      - com.redhat.example.entity.AvailableDepositAmountDataEntity
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: service_request
+        type: CheckAvailableDepositAmountRequestType
+        description: 入金可能額試算要求
+        annotations: 
+      - 
+        name: response_result
+        type: String
+        description: 結果
+        annotations: 
+      - 
+        name: err_code
+        type: String
+        description: エラーコード
+        annotations: 
+      - 
+        name: err_context
+        type: String
+        description: エラー内容
+        annotations: 
+      - 
+        name: deposit_available_amount_data
+        type: AvailableDepositAmountDataEntity
+        description: 入金可能額情報
+        annotations: 
+  - 
+    name: DepositAllocationRequestType
+    description: 入金充当試算要求
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+      - com.redhat.example.entity.AvailableDepositAmountDataEntity
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: request_id
+        type: String
+        description: 入金要求番号
+        annotations:
+      - 
+        name: customer_contract_number
+        type: String
+        description: 顧客契約番号
+        annotations:
+      - 
+        name: deposit_date
+        type: String
+        description: 入金年月日
+        annotations:
+      - 
+        name: customer_billing_due_date
+        type: String
+        description: 顧客請求締年月日
+        annotations:
+      - 
+        name: contract_settlement_date
+        type: String
+        description: 約定決済年月日
+        annotations:
+      - 
+        name: deposit_category_code
+        type: String
+        description: 入金種類区分
+        annotations: 
+      - 
+        name: deposit_amount
+        type: BigDecimal
+        description: 入金額
+        annotations: 
+      - 
+        name: excess_money_handling_category
+        type: String
+        description: 過剰金取扱区分
+        annotations:
+      - 
+        name: deposit_available_amount_data
+        type: AvailableDepositAmountDataEntity
+        description: 入金可能額情報
+        annotations:
+  - 
+    name: DepositAllocationResponseType
+    description: 入金充当試算応答
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+      - com.redhat.example.entity.DepositAllocationDataEntity
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: service_request
+        type: DepositAllocationRequestType
+        description: 入金充当試算要求
+        annotations: 
+      - 
+        name: response_result
+        type: String
+        description: 結果
+        annotations: 
+      - 
+        name: err_code
+        type: String
+        description: エラーコード
+        annotations: 
+      - 
+        name: err_context
+        type: String
+        description: エラー内容
+        annotations: 
+      - 
+        name: deposit_allocation_data
+        type: DepositAllocationDataEntity
+        description: 入金充当情報
+        annotations: 
+  - 
+    name: DepositRequestType
+    description: 入金要求
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+      - com.redhat.example.entity.DepositAllocationDataEntity
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: request_id
+        type: String
+        description: 入金要求番号
+        annotations:
+      - 
+        name: customer_contract_number
+        type: String
+        description: 顧客契約番号
+        annotations:
+      - 
+        name: deposit_date
+        type: String
+        description: 入金年月日
+        annotations:
+      - 
+        name: customer_billing_due_date
+        type: String
+        description: 顧客請求締年月日
+        annotations:
+      - 
+        name: contract_settlement_date
+        type: String
+        description: 約定決済年月日
+        annotations:
+      - 
+        name: deposit_category_code
+        type: String
+        description: 入金種類区分
+        annotations: 
+      - 
+        name: deposit_amount
+        type: BigDecimal
+        description: 入金額
+        annotations: 
+      - 
+        name: excess_money_handling_category
+        type: String
+        description: 過剰金取扱区分
+        annotations:
+      - 
+        name: deposit_allocation_data
+        type: DepositAllocationDataEntity
+        description: 入金充当試算情報
+        annotations:
+  - 
+    name: DepositResponseType
+    description: 入金応答
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+      - com.redhat.example.entity.DepositDataEntity
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: service_request
+        type: DepositRequestType
+        description: 入金依頼
+        annotations: 
+      - 
+        name: response_result
+        type: String
+        description: 結果
+        annotations: 
+      - 
+        name: err_code
+        type: String
+        description: エラーコード
+        annotations: 
+      - 
+        name: err_context
+        type: String
+        description: エラー内容
+        annotations: 
+      - 
+        name: deposit_data
+        type: DepositDataEntity
+        description: 入金情報
+        annotations: 
+  - 
+    name: AvailableDepositAmountDataEntity
+    description: 入金可能額情報
+    packages: com.redhat.example.entity
+    import_list:
+      - lombok.Data
+    annotations:
+      - Data
+    properties:
+      - 
+        name: estimated_billing_amount
+        type: SeikyuCompositeUnitEntity
+        description: 請求予定額
+        annotations: 
+      - 
+        name: deposit_available_amount
+        type: SaikenCompositeUnitEntity
+        description: 入金可能額
+        annotations: 
+  - 
+    name: DepositAllocationDataEntity
+    description: 入金充当情報
+    packages: com.redhat.example.entity
+    import_list:
+      - lombok.Data
+      - java.math.BigDecimal
+    annotations:
+      - Data
+    properties:
+      - 
+        name: deposit_allocation_amount
+        type: SaikenCompositeUnitEntity
+        description: 入金充当額
+        annotations: 
+      - 
+        name: estimated_billing_amount
+        type: SeikyuCompositeUnitEntity
+        description: 残請求予定額
+        annotations: 
+      - 
+        name: excess_money
+        type: BigDecimal
+        description: 過剰金
+        annotations: 
+  - 
+    name: DepositDataEntity
+    description: 入金情報
+    packages: com.redhat.example.entity
+    import_list:
+      - lombok.Data
+      - java.math.BigDecimal
+    annotations:
+      - Data
+    properties:
+      - 
+        name: deposit_allocation_amount
+        type: SaikenCompositeUnitEntity
+        description: 入金充当情報
+        annotations:
+      - 
+        name: excess_money
+        type: BigDecimal
+        description: 過剰金
+        annotations:
+      - 
+        name: estimated_billing_amount
+        type: SeikyuCompositeUnitEntity
+        description: 残請求予定額
+        annotations:
+      - 
+        name: balance_amount
+        type: SaikenCompositeUnitEntity
+        description: 残高
+        annotations:
+  - 
+    name: SeikyuCompositeUnitEntity
+    description: 請求複合情報
+    packages: com.redhat.example.entity
+    import_list:
+      - lombok.Data
+      - java.util.Map
+    annotations:
+      - Data
+    properties:
+      - 
+        name: total_billing
+        type: SeikyuSimpleUnitEntity
+        description: 請求合計
+        annotations:        
+      - 
+        name: products_billing_map
+        type: Map<String, SeikyuSimpleUnitEntity>
+        description: 請求商品マップ
+        annotations:
+  - 
+    name: SeikyuSimpleUnitEntity
+    description: 請求商品情報
+    packages: com.redhat.example.entity
+    import_list:
+      - lombok.Data
+      - java.math.BigDecimal
+    annotations:
+      - Data
+    properties:
+      - 
+        name: billing_principal_amount
+        type: BigDecimal
+        description: 請求元本額
+        annotations: 
+      - 
+        name: billing_interest_amount
+        type: BigDecimal
+        description: 請求利息額
+        annotations: 
+      - 
+        name: deposit_principal_amount
+        type: BigDecimal
+        description: 入金元本額
+        annotations: 
+      - 
+        name: deposit_interest_amount
+        type: BigDecimal
+        description: 入金利息額
+        annotations: 
+  - 
+    name: SaikenCompositeUnitEntity
+    description: 債権複合情報
+    packages: com.redhat.example.entity
+    import_list:
+      - lombok.Data
+      - java.util.Map
+    annotations:
+      - Data
+    properties:
+      - 
+        name: total_amout
+        type: SaikenSimpleUnitEntity
+        description: 債権合計
+        annotations: 
+      - 
+        name: products_amount_map
+        type: Map<String, SaikenSimpleUnitEntity>
+        description: 債権商品マップ
+        annotations: 
+  - 
+    name: SaikenSimpleUnitEntity
+    description: 債権商品情報
+    packages: com.redhat.example.entity
+    import_list:
+      - lombok.Data
+      - java.math.BigDecimal
+    annotations:
+      - Data
+    properties:
+      - 
+        name: principal_amount
+        type: BigDecimal
+        description: 元本額
+        annotations: 
+      - 
+        name: interest_amount
+        type: BigDecimal
+        description: 利息額
+        annotations: 
