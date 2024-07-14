@@ -3,6 +3,7 @@ package com.redhat.example.rule;
 import org.yaml.snakeyaml.Yaml;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 // Spring
 import org.springframework.stereotype.Component;
@@ -86,11 +87,10 @@ public class CreatePopJClassRule {
     /** Folder Name */
     public String getFolderName (String package_name) {
         String foldername = "";
-        String packagelist[] = package_name.split(".");
-        for (String s : packagelist) {
-            foldername = foldername + "/" + s;
+        String[] packagelist = package_name.split(Pattern.quote("."));
+        for (int i = 0; i < packagelist.length; i++) {
+            foldername = foldername + "/" + packagelist[i];
         }
-        System.out.println("package: " + package_name + ",list: " + packagelist + ", folder: " + foldername);
         return foldername;
     }
 }
