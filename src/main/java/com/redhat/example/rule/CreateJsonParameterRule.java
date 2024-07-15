@@ -48,7 +48,8 @@ public class CreateJsonParameterRule {
             }
             //System.out.println(str);
         }
-
+        route_entity.setPackage_name(package_name);
+        
         return route_entity;
     }
 

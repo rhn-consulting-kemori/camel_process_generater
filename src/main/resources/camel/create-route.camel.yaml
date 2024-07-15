@@ -26,10 +26,20 @@
             description: application-yaml作成
             uri: direct:create-app-yml
             parameters: {}
+        - to:
+            id: to-create-pom-xml
+            description: pom-xml作成
+            uri: direct:create-pom-xml
+            parameters: {}
+        - to:
+            id: to-create-boot-app
+            description: boot-app作成
+            uri: direct:create-boot-app
+            parameters: {}
         - log:
             id: log-Complete
             description: Complete Log
-            message: -- [Complite] -- Created Camel Route YAML
+            message: -- [Complete] -- Created Camel Route YAML
 - route:
     id: route-uml-to-json
     from:
@@ -56,7 +66,7 @@
         - to:
             id: to-2087
             description: Json出力
-            uri: file:data/output/json
+            uri: file:data/output/src/main/resources/camel
             parameters:
               fileName: camel_create.json
         - log:
@@ -82,7 +92,7 @@
             ref: createProcessRule
         - to:
             id: to-file-camel-route
-            uri: file:data/output/yaml
+            uri: file:data/output/src/main/resources/camel
             parameters:
               fileName: result-route.camel.yaml
         - log:
@@ -92,7 +102,7 @@
     id: route-create-app-yml
     from:
       id: from-create-app-yml
-      description: Camel Route作成
+      description: Applicatiom-yaml作成
       uri: direct:create-app-yml
       parameters: {}
       steps:
@@ -108,12 +118,60 @@
             ref: createApplicationYml
         - to:
             id: to-file-app-yml
-            uri: file:data/output/yaml
+            uri: file:data/output/src/main/resources
             parameters:
               fileName: application.yaml
         - log:
             id: log-create-app-yml
             message: -- [Create Application YML] --
+- route:
+    id: route-create-pom-xml
+    from:
+      id: from-create-pom-xml
+      description: pom-xml作成
+      uri: direct:create-pom-xml
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-create-pom-xml
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - bean:
+            id: bean-create-pom-xml
+            description: pom-xml作成
+            method: createPom
+            ref: createPomXml
+        - split:
+            id: split-pom
+            steps:
+              - setProperty:
+                  id: setProperty-filename
+                  expression:
+                    simple:
+                      expression: ${body.filename}
+                  name: env_file_name
+              - setProperty:
+                  id: setProperty-context
+                  expression:
+                    simple:
+                      expression: ${body.context}
+                  name: env_context
+              - setBody:
+                  id: setBody-context
+                  expression:
+                    simple:
+                      expression: ${exchangeProperty.env_context}
+              - to:
+                  id: to-file-pom-xml
+                  uri: file:data/output
+                  parameters:
+                    fileName: ${exchangeProperty.env_file_name}
+            expression:
+              simple: ${body}
+        - log:
+            id: log-create-pom-xml
+            message: -- [Create Pom XML] --
 - route:
     id: route-class-yml
     from:
@@ -164,3 +222,52 @@
         - log:
             id: log-5789
             message: --  [Complete create Class] --
+- route:
+    id: route-create-boot-app
+    from:
+      id: from-create-boot-app
+      description: boot-app作成
+      uri: direct:create-boot-app
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-create-boot-app
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - bean:
+            id: bean-create-boot-app
+            description: boot-app作成
+            method: createBoot
+            ref: createBootApp
+        - setProperty:
+            id: setProperty-boot-className
+            expression:
+              simple:
+                expression: ${body.className}
+            name: boot_class_name
+        - setProperty:
+            id: setProperty-boot-packageName
+            expression:
+              simple:
+                expression: ${body.packageName}
+            name: boot_package_name
+        - setProperty:
+            id: setProperty-boot-javacode
+            expression:
+              simple:
+                expression: ${body.javaCode}
+            name: boot_java_code
+        - setBody:
+            id: setBody-boot
+            expression:
+              simple:
+                expression: ${exchangeProperty.boot_java_code}
+        - to:
+            id: to-file-boot
+            uri: file:data/output/src/main/java
+            parameters:
+              fileName: ${exchangeProperty.boot_package_name}/${exchangeProperty.boot_class_name}.java
+        - log:
+            id: log-create-boot-app
+            message: -- [Create Boot App] --
