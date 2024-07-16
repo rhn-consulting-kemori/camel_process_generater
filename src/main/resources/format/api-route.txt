@@ -63,9 +63,25 @@
                         simple:
                           expression: ${body.err_context}
                       name: err_context
+                  - setBody:
+                      id: setBody-#process_name#-#business_data#
+                      description: #process_name_japanese#結果
+                      expression:
+                        simple:
+                          expression: ${exchangeProperty.#business_data#}
+                  - marshal:
+                      description: Class→JSON変換
+                      json: {}
+                  - setProperty:
+                      id: setProperty-#process_name#-#business_data#
+                      description: #process_name_japanese#結果設定-Json
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: #business_data#_json
                   - log:
                       id: log-#process_name#-complete
-                      message: "[#process_name#] - (${exchangeProperty.process_request.request_id}) - done"
+                      message: "[#process_name#] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0

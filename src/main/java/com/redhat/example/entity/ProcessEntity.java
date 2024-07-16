@@ -10,6 +10,7 @@ public class ProcessEntity {
     private String process_name_japanese;
     private String process_type;
     private String process_request_set_parameter;
+    private String process_request_set_parameter_error;
 
     // Bean
     private String rule_class;

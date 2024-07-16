@@ -148,7 +148,7 @@ public class CreateJsonParameterRule {
         ArrayList<String> processCompBlockList = new ArrayList<>();
 
         for (int i = 1; i < strblocklist.size(); i++) {
-            if(strblocklist.get(i).startsWith("#Aqua") || strblocklist.get(i).startsWith("#Orange") || strblocklist.get(i).startsWith("#Lime") || strblocklist.get(i).startsWith("#GreenYellow")) {
+            if(strblocklist.get(i).startsWith("#Aqua") || strblocklist.get(i).startsWith("#Orange") || strblocklist.get(i).startsWith("#Lime") || strblocklist.get(i).startsWith("#GreenYellow") || strblocklist.get(i).startsWith("#LightGreen") || strblocklist.get(i).startsWith("#Coral")) {
 
                 // Block push
                 ArrayList<String> processCompBlockList_push = new ArrayList<>();
@@ -163,7 +163,7 @@ public class CreateJsonParameterRule {
                 processCompBlockList = new ArrayList<String>(Arrays.asList(strblocklist.get(i)));
 
             } else {
-                if(strblocklist.get(i).equals("note left") || strblocklist.get(i).equals("end note")) {
+                if(strblocklist.get(i).equals("note left") || strblocklist.get(i).equals("end note") || strblocklist.get(i).equals("note right") || strblocklist.get(i).equals("if (Error?) then (no)") || strblocklist.get(i).equals("else(yes)") || strblocklist.get(i).equals("end if")) {
                 } else {
                     processCompBlockList.add(strblocklist.get(i));
                 }
@@ -197,6 +197,11 @@ public class CreateJsonParameterRule {
             processEnt.setProcess_type("bean");
             processEnt.setRule_class(processCompBlockList.get(1).replace("*", "").replace(" ", ""));
             processEnt.setRule_method(processCompBlockList.get(2).replace("*", "").replace(" ", ""));
+        // Rule: Bean End
+        } else if(processCompBlockList.get(0).startsWith("#Coral")) {
+            processEnt.setProcess_type("bean-end");
+            processEnt.setRule_class(processCompBlockList.get(1).replace("*", "").replace(" ", ""));
+            processEnt.setRule_method(processCompBlockList.get(2).replace("*", "").replace(" ", ""));
         // Request
         } else if(processCompBlockList.get(0).startsWith("#Lime")) {
             String process_request_set_parameter = "";
@@ -204,13 +209,31 @@ public class CreateJsonParameterRule {
                 process_request_set_parameter = process_request_set_parameter + processCompBlockList.get(i).trim();
             }
             processEnt.setProcess_request_set_parameter(process_request_set_parameter);
+        // Request Error
+        } else if(processCompBlockList.get(0).startsWith("#LightGreen")) {
+            String process_request_set_parameter_error = "";
+            for (int i = 2; i < processCompBlockList.size(); i++) {
+                process_request_set_parameter_error = process_request_set_parameter_error + processCompBlockList.get(i).trim();
+            }
+            processEnt.setProcess_request_set_parameter_error(process_request_set_parameter_error);
         // Response
         } else if(processCompBlockList.get(0).startsWith("#GreenYellow")) {
             String class_str = processCompBlockList.get(1).replace("*", "").replace(" ", "");
-            processEnt.setResponse_entity_class(class_str.substring(0,1).toLowerCase() + class_str.substring(1, class_str.length()));
+            processEnt.setResponse_entity_class(getResponseEntityClass(class_str));
             processEnt.setBusiness_data(processCompBlockList.get(2).replace("*", "").replace(" ", ""));
         } else {
         }
         return processEnt;
+    }
+
+    // response entity class
+    public String getResponseEntityClass(String class_name) {
+        if (class_name.endsWith("Entity")) {
+            return package_name + ".entity." + class_name;
+        } else if (class_name.endsWith("Type")) {
+            return package_name + ".type." + class_name;
+        } else {
+            return package_name + "." + class_name;
+        }
     }
 }

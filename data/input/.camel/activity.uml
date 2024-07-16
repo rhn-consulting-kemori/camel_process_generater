@@ -189,6 +189,7 @@ note left
 * deposit_data
 end note
 |入金結果連携@deposit-result-message|
+if (Error?) then (no)
 #Lime :入金結果連携依頼/
 note left
 * DepositResultMessageRequestType
@@ -207,7 +208,21 @@ note left
         ${exchangeProperty.deposit_data_json}
 }
 end note
-#Orange :入金イベント設定ルール|
+else(yes)
+#LightGreen :入金結果連携依頼/
+note right
+* DepositResultMessageRequestType
+{
+    "deposit_request": ${exchangeProperty.deposit_request_json}, 
+    "deposit_result": "${exchangeProperty.deposit_result}", 
+    "err_code": "${exchangeProperty.err_code}", 
+    "err_context": "${exchangeProperty.err_context}", 
+    "deposit_category_code": "", 
+    "deposit_data": {}
+}
+end note
+end if
+#Coral :入金イベント設定ルール|
 note left
 * depositResultMessageRule
 * executeRule

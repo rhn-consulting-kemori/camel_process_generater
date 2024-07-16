@@ -1,4 +1,3 @@
-
 - route:
     id: route-process
     from:
@@ -114,7 +113,6 @@
               simple:
                 expression: ""
             name: err_context
-
 - route:
     id: format-check
     from:
@@ -230,7 +228,7 @@
                       id: unmarshal-deposit-entry-check-response
                       description: json->java変換
                       json:
-                        unmarshalType: depositEntryCheckResponseType
+                        unmarshalType: com.redhat.example.type.DepositEntryCheckResponseType
                   - setProperty:
                       id: setProperty-deposit-entry-check-response
                       description: HTTP結果設定
@@ -259,9 +257,25 @@
                         simple:
                           expression: ${body.err_context}
                       name: err_context
+                  - setBody:
+                      id: setBody-deposit-entry-check-response_result
+                      description: 入金受付チェック結果
+                      expression:
+                        simple:
+                          expression: ${exchangeProperty.response_result}
+                  - marshal:
+                      description: Class→JSON変換
+                      json: {}
+                  - setProperty:
+                      id: setProperty-deposit-entry-check-response_result
+                      description: 入金受付チェック結果設定-Json
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: response_result_json
                   - log:
                       id: log-deposit-entry-check-complete
-                      message: "[deposit-entry-check] - (${exchangeProperty.process_request.request_id}) - done"
+                      message: "[deposit-entry-check] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
@@ -315,7 +329,7 @@
                       id: unmarshal-deposit-category-response
                       description: json->java変換
                       json:
-                        unmarshalType: depositCategoryResponseType
+                        unmarshalType: com.redhat.example.type.DepositCategoryResponseType
                   - setProperty:
                       id: setProperty-deposit-category-response
                       description: HTTP結果設定
@@ -344,9 +358,25 @@
                         simple:
                           expression: ${body.err_context}
                       name: err_context
+                  - setBody:
+                      id: setBody-deposit-category-deposit_category_code
+                      description: 入金種類判定結果
+                      expression:
+                        simple:
+                          expression: ${exchangeProperty.deposit_category_code}
+                  - marshal:
+                      description: Class→JSON変換
+                      json: {}
+                  - setProperty:
+                      id: setProperty-deposit-category-deposit_category_code
+                      description: 入金種類判定結果設定-Json
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: deposit_category_code_json
                   - log:
                       id: log-deposit-category-complete
-                      message: "[deposit-category] - (${exchangeProperty.process_request.request_id}) - done"
+                      message: "[deposit-category] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
@@ -400,7 +430,7 @@
                       id: unmarshal-check-available-deposit-amount-response
                       description: json->java変換
                       json:
-                        unmarshalType: checkAvailableDepositAmountResponseType
+                        unmarshalType: com.redhat.example.type.CheckAvailableDepositAmountResponseType
                   - setProperty:
                       id: setProperty-check-available-deposit-amount-response
                       description: HTTP結果設定
@@ -429,9 +459,25 @@
                         simple:
                           expression: ${body.err_context}
                       name: err_context
+                  - setBody:
+                      id: setBody-check-available-deposit-amount-deposit_available_amount_data
+                      description: 入金可能額試算結果
+                      expression:
+                        simple:
+                          expression: ${exchangeProperty.deposit_available_amount_data}
+                  - marshal:
+                      description: Class→JSON変換
+                      json: {}
+                  - setProperty:
+                      id: setProperty-check-available-deposit-amount-deposit_available_amount_data
+                      description: 入金可能額試算結果設定-Json
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: deposit_available_amount_data_json
                   - log:
                       id: log-check-available-deposit-amount-complete
-                      message: "[check-available-deposit-amount] - (${exchangeProperty.process_request.request_id}) - done"
+                      message: "[check-available-deposit-amount] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
@@ -485,7 +531,7 @@
                       id: unmarshal-deposit-allocation-response
                       description: json->java変換
                       json:
-                        unmarshalType: depositAllocationResponseType
+                        unmarshalType: com.redhat.example.type.DepositAllocationResponseType
                   - setProperty:
                       id: setProperty-deposit-allocation-response
                       description: HTTP結果設定
@@ -514,9 +560,25 @@
                         simple:
                           expression: ${body.err_context}
                       name: err_context
+                  - setBody:
+                      id: setBody-deposit-allocation-deposit_allocation_data
+                      description: 入金充当額試算結果
+                      expression:
+                        simple:
+                          expression: ${exchangeProperty.deposit_allocation_data}
+                  - marshal:
+                      description: Class→JSON変換
+                      json: {}
+                  - setProperty:
+                      id: setProperty-deposit-allocation-deposit_allocation_data
+                      description: 入金充当額試算結果設定-Json
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: deposit_allocation_data_json
                   - log:
                       id: log-deposit-allocation-complete
-                      message: "[deposit-allocation] - (${exchangeProperty.process_request.request_id}) - done"
+                      message: "[deposit-allocation] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
@@ -570,7 +632,7 @@
                       id: unmarshal-deposit-response
                       description: json->java変換
                       json:
-                        unmarshalType: depositResponseType
+                        unmarshalType: com.redhat.example.type.DepositResponseType
                   - setProperty:
                       id: setProperty-deposit-response
                       description: HTTP結果設定
@@ -599,9 +661,25 @@
                         simple:
                           expression: ${body.err_context}
                       name: err_context
+                  - setBody:
+                      id: setBody-deposit-deposit_data
+                      description: 入金結果
+                      expression:
+                        simple:
+                          expression: ${exchangeProperty.deposit_data}
+                  - marshal:
+                      description: Class→JSON変換
+                      json: {}
+                  - setProperty:
+                      id: setProperty-deposit-deposit_data
+                      description: 入金結果設定-Json
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: deposit_data_json
                   - log:
                       id: log-deposit-complete
-                      message: "[deposit] - (${exchangeProperty.process_request.request_id}) - done"
+                      message: "[deposit] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
@@ -633,9 +711,11 @@
               id: otherwise-deposit-result-message
               description: エラーあり
               steps:
-                - log:
-                    id: log-deposit-result-message-error-skipped
-                    message: "[deposit-result-message] - (${exchangeProperty.process_request.request_id}) - skipped"
+                - to:
+                    id: to-deposit-result-message-setrequest-error
+                    description: 入金結果連携要求設定-エラー
+                    uri: direct:deposit-result-message-setrequest-error
+                    parameters: {}
             when:
               - id: when-deposit-result-message
                 description: エラーなし
@@ -645,45 +725,25 @@
                       description: 入金結果連携要求設定
                       uri: direct:deposit-result-message-setrequest
                       parameters: {}
-                  - bean:
-                      id: bean-deposit-result-message-rule
-                      description: 入金結果連携ルール
-                      method: executeRule
-                      ref: depositResultMessageRule
-                  - setProperty:
-                      id: setProperty-deposit-result-message_response
-                      description: 応答結果設定
-                      expression:
-                        simple:
-                          expression: ${body}
-                      name: deposit-result-message_response
-                  - setProperty:
-                      id: setProperty-deposit-result-message-process_result
-                      description: 結果設定
-                      expression:
-                        simple:
-                          expression: ${body.response_result}
-                      name: process_result
-                  - setProperty:
-                      id: setProperty-deposit-result-message-err_code
-                      description: エラーコード設定
-                      expression:
-                        simple:
-                          expression: ${body.err_code}
-                      name: err_code
-                  - setProperty:
-                      id: setProperty-deposit-result-message-err_context
-                      description: エラー内容設定
-                      expression:
-                        simple:
-                          expression: ${body.err_context}
-                      name: err_context
-                  - log:
-                      id: log-deposit-result-message-complete
-                      message: "[deposit-result-message] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
+        - unmarshal:
+            id: unmarshal-deposit-result-message-rule-request
+            description: json->java変換
+            json:
+              unmarshalType: com.redhat.example.type.DepositResultMessageResponseType
+        - bean:
+            id: bean-deposit-result-message-rule
+            description: 入金結果連携ルール
+            method: executeRule
+            ref: depositResultMessageRule
+        - marshal:
+            description: Class→JSON変換
+            json: {}
+        - log:
+            id: log-deposit-result-message-complete
+            message: "[deposit-result-message] - (${exchangeProperty.process_request.request_id}) - ${body}"
 - route:
     id: deposit-result-message-request
     from:
@@ -698,6 +758,20 @@
             expression:
               simple:
                 expression: '{"deposit_request":${exchangeProperty.process_request_json},"deposit_result":"${exchangeProperty.process_request}","err_code":"${exchangeProperty.err_code}","err_context":"${exchangeProperty.err_context}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_data":${exchangeProperty.deposit_data_json}}'
+- route:
+    id: deposit-result-message-request-error
+    from:
+      id: from-deposit-result-message-request-error
+      description: 入金結果連携要求設定-エラー
+      uri: direct:deposit-result-message-setrequest-error
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-deposit-result-message-setrequest-error
+            description: 依頼データ設定-エラー
+            expression:
+              simple:
+                expression: '{"deposit_request": ${exchangeProperty.deposit_request_json},"deposit_result": "${exchangeProperty.deposit_result}","err_code": "${exchangeProperty.err_code}","err_context": "${exchangeProperty.err_context}","deposit_category_code": "","deposit_data": {}}'
 - route:
     id: finish-process
     from:

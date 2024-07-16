@@ -84,6 +84,7 @@ public class CreateApplicationYml {
         
         List<String> targetList = new ArrayList<>();
         targetList.add(entity.getProcess_request_set_parameter());
+        targetList.add(entity.getProcess_request_set_parameter_error());
         targetList.add(entity.getRule_class());
         targetList.add(entity.getRule_method());
         targetList.add(entity.getHttp_url());
