@@ -66,7 +66,7 @@
         - to:
             id: to-2087
             description: Json出力
-            uri: file:data/output/src/main/resources/camel
+            uri: file:data/output/src/main/resources/json
             parameters:
               fileName: camel_create.json
         - log:

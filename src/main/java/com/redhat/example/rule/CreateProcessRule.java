@@ -183,7 +183,7 @@ public class CreateProcessRule {
             .replace("#process_request_set_parameter_error#", "'" + process_entity.getProcess_request_set_parameter_error() + "'")
             .replace("#rule_class#", process_entity.getRule_class())
             .replace("#rule_method#", process_entity.getRule_method())
-            .replace("#response_entity_class#", process_entity.getResponse_entity_class());
+            .replace("#request_entity_class#", process_entity.getRequest_entity_class());
 
         return processString;
     }

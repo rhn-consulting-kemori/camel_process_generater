@@ -204,6 +204,8 @@ public class CreateJsonParameterRule {
             processEnt.setRule_method(processCompBlockList.get(2).replace("*", "").replace(" ", ""));
         // Request
         } else if(processCompBlockList.get(0).startsWith("#Lime")) {
+            String class_str = processCompBlockList.get(1).replace("*", "").replace(" ", "");
+            processEnt.setRequest_entity_class(getResponseEntityClass(class_str));
             String process_request_set_parameter = "";
             for (int i = 2; i < processCompBlockList.size(); i++) {
                 process_request_set_parameter = process_request_set_parameter + processCompBlockList.get(i).trim();

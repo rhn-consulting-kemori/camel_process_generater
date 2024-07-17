@@ -3,6 +3,7 @@ package com.redhat.example.type;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 import com.redhat.example.entity.DepositAllocationDataEntity;
+import java.math.BigDecimal;
 
 // 入金要求
 @Data

@@ -197,7 +197,7 @@ note left
     "deposit_request": 
         ${exchangeProperty.process_request_json}, 
     "deposit_result": 
-        "${exchangeProperty.process_request}", 
+        "${exchangeProperty.process_result}", 
     "err_code": 
         "${exchangeProperty.err_code}", 
     "err_context": 
@@ -214,7 +214,7 @@ note right
 * DepositResultMessageRequestType
 {
     "deposit_request": ${exchangeProperty.deposit_request_json}, 
-    "deposit_result": "${exchangeProperty.deposit_result}", 
+    "deposit_result": "${exchangeProperty.process_result}", 
     "err_code": "${exchangeProperty.err_code}", 
     "err_context": "${exchangeProperty.err_context}", 
     "deposit_category_code": "", 
@@ -229,13 +229,13 @@ note left
 end note
 #GreenYellow :入金結果連携結果/
 note left
-* DepositResultMessageResponseType
+* KijitsuNyukinResponseEntity
 * 
 end note
 |END|
 #Yellow :入金イベント]
 note left
-* DepositResultMessageResponseType
+* KijitsuNyukinResponseEntity
 end note
 stop
 note left

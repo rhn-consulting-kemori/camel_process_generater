@@ -19,11 +19,12 @@
               - id: when-#process_name#
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-#process_name#-setrequest
-                      description: #process_name_japanese#要求設定
-                      uri: direct:#process_name#-setrequest
-                      parameters: {}
+                  - setBody:
+                      id: setBody-#process_name#-setrequest
+                      description: 依頼データ設定
+                      expression:
+                        simple:
+                          expression: #process_request_set_parameter#
                   - bean:
                       id: bean-#process_name#-rule
                       description: #process_name_japanese#ルール
@@ -63,17 +64,3 @@
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
-- route:
-    id: #process_name#-request
-    from:
-      id: from-#process_name#-request
-      description: #process_name_japanese#要求設定
-      uri: direct:#process_name#-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-#process_name#-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: #process_request_set_parameter#

@@ -12,20 +12,22 @@
               id: otherwise-#process_name#
               description: エラーあり
               steps:
-                - to:
-                    id: to-#process_name#-setrequest-error
+                - setBody:
+                    id: setBody-#process_name#-setrequest-error
                     description: #process_name_japanese#要求設定-エラー
-                    uri: direct:#process_name#-setrequest-error
-                    parameters: {}
+                    expression:
+                      simple:
+                        expression: #process_request_set_parameter_error#
             when:
               - id: when-#process_name#
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-#process_name#-setrequest
+                  - setBody:
+                      id: setBody-#process_name#-setrequest
                       description: #process_name_japanese#要求設定
-                      uri: direct:#process_name#-setrequest
-                      parameters: {}
+                      expression:
+                        simple:
+                          expression: #process_request_set_parameter#
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
@@ -33,7 +35,7 @@
             id: unmarshal-#process_name#-rule-request
             description: json->java変換
             json:
-              unmarshalType: #response_entity_class#
+              unmarshalType: #request_entity_class#
         - bean:
             id: bean-#process_name#-rule
             description: #process_name_japanese#ルール
@@ -45,31 +47,3 @@
         - log:
             id: log-#process_name#-complete
             message: "[#process_name#] - (${exchangeProperty.process_request.request_id}) - ${body}"
-- route:
-    id: #process_name#-request
-    from:
-      id: from-#process_name#-request
-      description: #process_name_japanese#要求設定
-      uri: direct:#process_name#-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-#process_name#-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: #process_request_set_parameter#
-- route:
-    id: #process_name#-request-error
-    from:
-      id: from-#process_name#-request-error
-      description: #process_name_japanese#要求設定-エラー
-      uri: direct:#process_name#-setrequest-error
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-#process_name#-setrequest-error
-            description: 依頼データ設定-エラー
-            expression:
-              simple:
-                expression: #process_request_set_parameter_error#

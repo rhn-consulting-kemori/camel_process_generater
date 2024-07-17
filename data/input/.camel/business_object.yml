@@ -391,6 +391,7 @@ classes:
       - lombok.Data
       - org.springframework.stereotype.Component
       - com.redhat.example.entity.AvailableDepositAmountDataEntity
+      - java.math.BigDecimal
     annotations:
       - Data
       - Component
@@ -485,6 +486,7 @@ classes:
       - lombok.Data
       - org.springframework.stereotype.Component
       - com.redhat.example.entity.DepositAllocationDataEntity
+      - java.math.BigDecimal
     annotations:
       - Data
       - Component
@@ -571,6 +573,49 @@ classes:
         type: DepositDataEntity
         description: 入金情報
         annotations: 
+  -
+    name: DepositResultMessageRequestType
+    description: 入金結果メッセージ要求
+    packages: com.redhat.example.type
+    import_list:
+      - lombok.Data
+      - org.springframework.stereotype.Component
+      - com.redhat.example.entity.KijitsuNyukinRequestEntity
+      - com.redhat.example.entity.DepositDataEntity
+    annotations:
+      - Data
+      - Component
+    properties:
+      - 
+        name: deposit_request
+        type: KijitsuNyukinRequestEntity
+        description: 入金依頼
+        annotations: 
+      - 
+        name: deposit_result
+        type: String
+        description: 入金結果
+        annotations: 
+      - 
+        name: err_code
+        type: String
+        description: エラーコード
+        annotations: 
+      - 
+        name: err_context
+        type: String
+        description: エラー内容
+        annotations: 
+      - 
+        name: deposit_category_code
+        type: String
+        description: 入金種類区分
+        annotations: 
+      - 
+        name: deposit_data
+        type: DepositDataEntity
+        description: 入金結果情報
+        annotations:
   - 
     name: AvailableDepositAmountDataEntity
     description: 入金可能額情報

@@ -15,6 +15,7 @@ public class ProcessEntity {
     // Bean
     private String rule_class;
     private String rule_method;
+    private String request_entity_class;
 
     // API
     private String http_url;

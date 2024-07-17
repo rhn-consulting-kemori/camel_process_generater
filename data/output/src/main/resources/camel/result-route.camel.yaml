@@ -134,11 +134,12 @@
               - id: when-format-check
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-format-check-setrequest
-                      description: フォーマットチェック要求設定
-                      uri: direct:format-check-setrequest
-                      parameters: {}
+                  - setBody:
+                      id: setBody-format-check-setrequest
+                      description: 依頼データ設定
+                      expression:
+                        simple:
+                          expression: '${exchangeProperty.process_request}'
                   - bean:
                       id: bean-format-check-rule
                       description: フォーマットチェックルール
@@ -179,20 +180,6 @@
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
 - route:
-    id: format-check-request
-    from:
-      id: from-format-check-request
-      description: フォーマットチェック要求設定
-      uri: direct:format-check-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-format-check-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: '${exchangeProperty.process_request}'
-- route:
     id: deposit-entry-check
     from:
       id: from-deposit-entry-check
@@ -213,11 +200,12 @@
               - id: when-deposit-entry-check
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-deposit-entry-check-setrequest
+                  - setBody:
+                      id: setBody-deposit-entry-check-setrequest
                       description: 入金受付チェック要求設定
-                      uri: direct:deposit-entry-check-setrequest
-                      parameters: {}
+                      expression:
+                        simple:
+                          expression: '{"request_id":"${exchangeProperty.process_request.request_id}","card_number":"${exchangeProperty.process_request.card_number}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_date":"${exchangeProperty.process_request.deposit_date}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}"}'
                   - to:
                       id: to-deposit-entry-check-service
                       description: 入金受付チェックサービス
@@ -280,20 +268,6 @@
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
 - route:
-    id: deposit-entry-check-request
-    from:
-      id: from-deposit-entry-check-request
-      description: 入金受付チェック要求設定
-      uri: direct:deposit-entry-check-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-deposit-entry-check-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","card_number":"${exchangeProperty.process_request.card_number}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_date":"${exchangeProperty.process_request.deposit_date}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}"}'
-- route:
     id: deposit-category
     from:
       id: from-deposit-category
@@ -314,11 +288,12 @@
               - id: when-deposit-category
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-deposit-category-setrequest
+                  - setBody:
+                      id: setBody-deposit-category-setrequest
                       description: 入金種類判定要求設定
-                      uri: direct:deposit-category-setrequest
-                      parameters: {}
+                      expression:
+                        simple:
+                          expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_date":"${exchangeProperty.process_request.deposit_date}"}'
                   - to:
                       id: to-deposit-category-service
                       description: 入金種類判定サービス
@@ -381,20 +356,6 @@
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
 - route:
-    id: deposit-category-request
-    from:
-      id: from-deposit-category-request
-      description: 入金種類判定要求設定
-      uri: direct:deposit-category-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-deposit-category-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_date":"${exchangeProperty.process_request.deposit_date}"}'
-- route:
     id: check-available-deposit-amount
     from:
       id: from-check-available-deposit-amount
@@ -415,11 +376,12 @@
               - id: when-check-available-deposit-amount
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-check-available-deposit-amount-setrequest
+                  - setBody:
+                      id: setBody-check-available-deposit-amount-setrequest
                       description: 入金可能額試算要求設定
-                      uri: direct:check-available-deposit-amount-setrequest
-                      parameters: {}
+                      expression:
+                        simple:
+                          expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}"}'
                   - to:
                       id: to-check-available-deposit-amount-service
                       description: 入金可能額試算サービス
@@ -482,20 +444,6 @@
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
 - route:
-    id: check-available-deposit-amount-request
-    from:
-      id: from-check-available-deposit-amount-request
-      description: 入金可能額試算要求設定
-      uri: direct:check-available-deposit-amount-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-check-available-deposit-amount-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}"}'
-- route:
     id: deposit-allocation
     from:
       id: from-deposit-allocation
@@ -516,11 +464,12 @@
               - id: when-deposit-allocation
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-deposit-allocation-setrequest
+                  - setBody:
+                      id: setBody-deposit-allocation-setrequest
                       description: 入金充当額試算要求設定
-                      uri: direct:deposit-allocation-setrequest
-                      parameters: {}
+                      expression:
+                        simple:
+                          expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}","deposit_available_amount_data":${exchangeProperty.deposit_available_amount_data_json}}'
                   - to:
                       id: to-deposit-allocation-service
                       description: 入金充当額試算サービス
@@ -583,20 +532,6 @@
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
 - route:
-    id: deposit-allocation-request
-    from:
-      id: from-deposit-allocation-request
-      description: 入金充当額試算要求設定
-      uri: direct:deposit-allocation-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-deposit-allocation-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}","deposit_available_amount_data":${exchangeProperty.deposit_available_amount_data_json}}'
-- route:
     id: deposit
     from:
       id: from-deposit
@@ -617,11 +552,12 @@
               - id: when-deposit
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-deposit-setrequest
+                  - setBody:
+                      id: setBody-deposit-setrequest
                       description: 入金要求設定
-                      uri: direct:deposit-setrequest
-                      parameters: {}
+                      expression:
+                        simple:
+                          expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}","deposit_allocation_data":${exchangeProperty.deposit_allocation_data_json}}'
                   - to:
                       id: to-deposit-service
                       description: 入金サービス
@@ -684,20 +620,6 @@
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
 - route:
-    id: deposit-request
-    from:
-      id: from-deposit-request
-      description: 入金要求設定
-      uri: direct:deposit-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-deposit-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: '{"request_id":"${exchangeProperty.process_request.request_id}","customer_contract_number":"${exchangeProperty.process_request.customer_contract_number}","deposit_date":"${exchangeProperty.process_request.deposit_date}","customer_billing_due_date":"${exchangeProperty.process_request.customer_billing_due_date}","contract_settlement_date":"${exchangeProperty.process_request.contract_settlement_date}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_amount":${exchangeProperty.process_request.deposit_amount},"excess_money_handling_category":"${exchangeProperty.process_request.excess_money_handling_category}","deposit_allocation_data":${exchangeProperty.deposit_allocation_data_json}}'
-- route:
     id: deposit-result-message
     from:
       id: from-deposit-result-message
@@ -711,20 +633,22 @@
               id: otherwise-deposit-result-message
               description: エラーあり
               steps:
-                - to:
-                    id: to-deposit-result-message-setrequest-error
+                - setBody:
+                    id: setBody-deposit-result-message-setrequest-error
                     description: 入金結果連携要求設定-エラー
-                    uri: direct:deposit-result-message-setrequest-error
-                    parameters: {}
+                    expression:
+                      simple:
+                        expression: '{"deposit_request": ${exchangeProperty.deposit_request_json},"deposit_result": "${exchangeProperty.process_result}","err_code": "${exchangeProperty.err_code}","err_context": "${exchangeProperty.err_context}","deposit_category_code": "","deposit_data": {}}'
             when:
               - id: when-deposit-result-message
                 description: エラーなし
                 steps:
-                  - to:
-                      id: to-deposit-result-message-setrequest
+                  - setBody:
+                      id: setBody-deposit-result-message-setrequest
                       description: 入金結果連携要求設定
-                      uri: direct:deposit-result-message-setrequest
-                      parameters: {}
+                      expression:
+                        simple:
+                          expression: '{"deposit_request":${exchangeProperty.process_request_json},"deposit_result":"${exchangeProperty.process_result}","err_code":"${exchangeProperty.err_code}","err_context":"${exchangeProperty.err_context}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_data":${exchangeProperty.deposit_data_json}}'
                 expression:
                   simple:
                     expression: ${exchangeProperty.process_result} == 0
@@ -732,7 +656,7 @@
             id: unmarshal-deposit-result-message-rule-request
             description: json->java変換
             json:
-              unmarshalType: com.redhat.example.type.DepositResultMessageResponseType
+              unmarshalType: com.redhat.example.type.DepositResultMessageRequestType
         - bean:
             id: bean-deposit-result-message-rule
             description: 入金結果連携ルール
@@ -744,34 +668,6 @@
         - log:
             id: log-deposit-result-message-complete
             message: "[deposit-result-message] - (${exchangeProperty.process_request.request_id}) - ${body}"
-- route:
-    id: deposit-result-message-request
-    from:
-      id: from-deposit-result-message-request
-      description: 入金結果連携要求設定
-      uri: direct:deposit-result-message-setrequest
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-deposit-result-message-setrequest
-            description: 依頼データ設定
-            expression:
-              simple:
-                expression: '{"deposit_request":${exchangeProperty.process_request_json},"deposit_result":"${exchangeProperty.process_request}","err_code":"${exchangeProperty.err_code}","err_context":"${exchangeProperty.err_context}","deposit_category_code":"${exchangeProperty.deposit_category_code}","deposit_data":${exchangeProperty.deposit_data_json}}'
-- route:
-    id: deposit-result-message-request-error
-    from:
-      id: from-deposit-result-message-request-error
-      description: 入金結果連携要求設定-エラー
-      uri: direct:deposit-result-message-setrequest-error
-      parameters: {}
-      steps:
-        - setBody:
-            id: setBody-deposit-result-message-setrequest-error
-            description: 依頼データ設定-エラー
-            expression:
-              simple:
-                expression: '{"deposit_request": ${exchangeProperty.deposit_request_json},"deposit_result": "${exchangeProperty.deposit_result}","err_code": "${exchangeProperty.err_code}","err_context": "${exchangeProperty.err_context}","deposit_category_code": "","deposit_data": {}}'
 - route:
     id: finish-process
     from:

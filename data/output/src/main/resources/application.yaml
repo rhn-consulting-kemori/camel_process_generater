@@ -16,10 +16,10 @@ camel:
       allow-manual-commit: true
 
 app:
-  input-topic-name: ""
-  output-topic-name: ""
-  url-deposit-entry-check: ""
-  url-deposit-category: ""
-  url-check-available-deposit-amount: ""
-  url-deposit-allocation: ""
-  url-deposit: ""
+  input-topic-name: "mytopic"
+  output-topic-name: "myresult"
+  url-deposit-entry-check: "localhost:8183/camel/demo/deposit-entry-check"
+  url-deposit-category: "localhost:8183/camel/demo/deposit-category"
+  url-check-available-deposit-amount: "localhost:8183/camel/demo/check-available-deposit-amount"
+  url-deposit-allocation: "localhost:8183/camel/demo/deposit-allocation"
+  url-deposit: "localhost:8183/camel/demo/deposit"
