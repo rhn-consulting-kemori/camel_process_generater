@@ -41,6 +41,12 @@
             description: #process_name_japanese#ルール
             method: #rule_method#
             ref: #rule_class#
+        - setProperty:
+            id: setProperty-#process_name#-setresponse
+            expression:
+              simple:
+                expression: ${body}
+            name: #process_name#_response
         - marshal:
             description: Class→JSON変換
             json: {}

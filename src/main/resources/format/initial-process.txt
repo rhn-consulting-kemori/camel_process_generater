@@ -6,12 +6,6 @@
       uri: direct:initial-process
       parameters: {}
       steps:
-        - filter:
-            id: filter-blank
-            description: 空データ除去
-            expression:
-              simple:
-                expression: ${body} != null
         - log:
             id: log-recieve-message
             message: "[Recieve Message] - ${body}"
