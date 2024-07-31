@@ -213,7 +213,7 @@ else(yes)
 note right
 * DepositResultMessageRequestType
 {
-    "deposit_request": ${exchangeProperty.deposit_request_json}, 
+    "deposit_request": ${exchangeProperty.process_request_json}, 
     "deposit_result": "${exchangeProperty.process_result}", 
     "err_code": "${exchangeProperty.err_code}", 
     "err_context": "${exchangeProperty.err_context}", 

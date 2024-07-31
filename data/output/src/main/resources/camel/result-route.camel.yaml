@@ -64,12 +64,6 @@
       uri: direct:initial-process
       parameters: {}
       steps:
-        - filter:
-            id: filter-blank
-            description: 空データ除去
-            expression:
-              simple:
-                expression: ${body} != null
         - log:
             id: log-recieve-message
             message: "[Recieve Message] - ${body}"
@@ -638,7 +632,7 @@
                     description: 入金結果連携要求設定-エラー
                     expression:
                       simple:
-                        expression: '{"deposit_request": ${exchangeProperty.deposit_request_json},"deposit_result": "${exchangeProperty.process_result}","err_code": "${exchangeProperty.err_code}","err_context": "${exchangeProperty.err_context}","deposit_category_code": "","deposit_data": {}}'
+                        expression: '{"deposit_request": ${exchangeProperty.process_request_json},"deposit_result": "${exchangeProperty.process_result}","err_code": "${exchangeProperty.err_code}","err_context": "${exchangeProperty.err_context}","deposit_category_code": "","deposit_data": {}}'
             when:
               - id: when-deposit-result-message
                 description: エラーなし
@@ -662,6 +656,12 @@
             description: 入金結果連携ルール
             method: executeRule
             ref: depositResultMessageRule
+        - setProperty:
+            id: setProperty-deposit-result-message-setresponse
+            expression:
+              simple:
+                expression: ${body}
+            name: deposit-result-message_response
         - marshal:
             description: Class→JSON変換
             json: {}
