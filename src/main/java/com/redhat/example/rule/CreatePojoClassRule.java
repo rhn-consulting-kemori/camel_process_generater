@@ -15,7 +15,7 @@ import com.redhat.example.entity.ClassYamlPropertyEntity;
 import com.redhat.example.entity.ClassYamlClassSetEntity;
 
 @Component
-public class CreatePopJClassRule {
+public class CreatePojoClassRule {
 
     /** Create PopJ Class */
     public List<ClassYamlClassSetEntity> createYamlClass(String entity_yaml) {

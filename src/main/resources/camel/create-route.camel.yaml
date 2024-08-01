@@ -181,9 +181,15 @@
       parameters:
         fileName: business_object.yml
       steps:
+        - setProperty:
+            id: setProperty-6884
+            expression:
+              simple:
+                expression: ${body}
+            name: class_yaml
         - to:
             id: to-1094
-            uri: bean:createPopJClassRule
+            uri: bean:createPojoClassRule
             parameters:
               method: createYamlClass
         - split:
@@ -194,34 +200,38 @@
                   expression:
                     simple:
                       expression: ${body.className}
-                  name: popj_class_name
+                  name: pojo_class_name
               - setProperty:
                   id: setProperty-packageName
                   expression:
                     simple:
                       expression: ${body.packageName}
-                  name: popj_package_name
+                  name: pojo_package_name
               - setProperty:
                   id: setProperty-2857
                   expression:
                     simple:
                       expression: ${body.javaCode}
-                  name: popj_java_code
+                  name: pojo_java_code
               - setBody:
                   id: setBody-3725
                   expression:
                     simple:
-                      expression: ${exchangeProperty.popj_java_code}
+                      expression: ${exchangeProperty.pojo_java_code}
               - to:
                   id: to-2095
                   uri: file:data/output/src/main/java
                   parameters:
-                    fileName: ${exchangeProperty.popj_package_name}/${exchangeProperty.popj_class_name}.java
+                    fileName: ${exchangeProperty.pojo_package_name}/${exchangeProperty.pojo_class_name}.java
             expression:
               simple: ${body}
         - log:
             id: log-5789
             message: --  [Complete create Class] --
+        - to:
+            id: to-3390
+            uri: direct:pojo-test-class-create
+            parameters: {}
 - route:
     id: route-create-boot-app
     from:
@@ -271,3 +281,56 @@
         - log:
             id: log-create-boot-app
             message: -- [Create Boot App] --
+- route:
+    id: route-create-pojo-test-class
+    from:
+      id: from-8556
+      uri: direct:pojo-test-class-create
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-create-pojo-test-class
+            expression:
+              simple:
+                expression: ${exchangeProperty.class_yaml}
+        - to:
+            id: to-8468
+            uri: bean:createPojoTestClassRule
+            parameters:
+              method: createYamlClass
+        - split:
+            id: split-test-class-create
+            steps:
+              - setProperty:
+                  id: setProperty-pojo-test-className
+                  expression:
+                    simple:
+                      expression: ${body.className}
+                  name: pojo_test_class_name
+              - setProperty:
+                  id: setProperty-pojo-test-packageName
+                  expression:
+                    simple:
+                      expression: ${body.packageName}
+                  name: pojo_test_package_name
+              - setProperty:
+                  id: setProperty-pojo-test-code
+                  expression:
+                    simple:
+                      expression: ${body.javaCode}
+                  name: pojo_test_java_code
+              - setBody:
+                  id: setBody-pojo-test-code
+                  expression:
+                    simple:
+                      expression: ${exchangeProperty.pojo_test_java_code}
+              - to:
+                  id: to-file-pojo-test-code
+                  uri: file:data/output/src/test/java
+                  parameters:
+                    fileName: ${exchangeProperty.pojo_test_package_name}/${exchangeProperty.pojo_test_class_name}.java
+            expression:
+              simple: ${body}
+        - log:
+            id: log-pojo_test_class
+            message: --  [Complete create Pojo Test Class] --
