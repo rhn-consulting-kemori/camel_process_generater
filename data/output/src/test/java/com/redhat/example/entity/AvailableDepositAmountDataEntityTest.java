@@ -1,16 +1,33 @@
 package com.redhat.example.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.StringUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
 
 // Test POJO class:入金可能額情報
 public class AvailableDepositAmountDataEntityTest {
+
+    // Target POJO Class
     private AvailableDepositAmountDataEntity obj;
+
+    // Expected Type Map
+    private Map<String, String> expected_type_map;
+
+    @BeforeEach
+    public void beforeEach() {
+        expected_type_map = new HashMap<String, String>();
+        expected_type_map.put("estimated_billing_amount", "SeikyuCompositeUnitEntity");
+        expected_type_map.put("deposit_available_amount", "SaikenCompositeUnitEntity");
+    }
 
     @SuppressWarnings("unchecked")
     @Test
@@ -41,6 +58,12 @@ public class AvailableDepositAmountDataEntityTest {
                     valueToSet = Boolean.FALSE;
                 } else if (dataType.isAssignableFrom(BigDecimal.class)) {
                     valueToSet = new BigDecimal("1");
+                } else if (dataType.isAssignableFrom(Map.class)) {
+                    Map<String, String> map = new HashMap<String, String>();
+                    valueToSet = map;
+                } else if (dataType.isAssignableFrom(List.class)) {
+                    List<String> list = new ArrayList<String>();
+                    valueToSet = list;
                 } else if (dataType.isAssignableFrom(SeikyuCompositeUnitEntity.class)) {
                     valueToSet = new SeikyuCompositeUnitEntity();
                 } else if (dataType.isAssignableFrom(SaikenCompositeUnitEntity.class)) {
@@ -51,8 +74,15 @@ public class AvailableDepositAmountDataEntityTest {
                 Method setterMethod = AvailableDepositAmountDataEntity.class.getMethod(setter, getterMethod.getReturnType());
                 setterMethod.invoke(obj, valueToSet);
                 Object result = getterMethod.invoke(obj);
+
+                // Assert Getter, Setter
                 assertEquals(result, valueToSet);
+
+                // Field Type
+                assertEquals(expected_type_map.get(fieldName), dataType.getSimpleName());
             }
+            // Field Count
+            assertEquals(expected_type_map.size(),fields.length);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
