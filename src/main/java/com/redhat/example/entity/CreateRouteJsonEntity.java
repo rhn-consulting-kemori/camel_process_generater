@@ -10,6 +10,7 @@ public class CreateRouteJsonEntity {
     private String from_end_point_uri;
     private String recieve_message_entity_class;
     private String to_end_point_uri;
+    private String response_message_entity_class;
     private String package_name;
     private List<ProcessEntity> process_list;
 }

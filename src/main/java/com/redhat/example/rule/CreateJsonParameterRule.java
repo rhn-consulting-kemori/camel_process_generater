@@ -124,9 +124,9 @@ public class CreateJsonParameterRule {
             } else {
                 if(strblocklist.get(i).startsWith("#Yellow")){
                 } else {
-                    if(this.route_entity.getTo_end_point_uri() == null || this.route_entity.getTo_end_point_uri().isEmpty()) {
-                        this.route_entity.setTo_end_point_uri("#Ready Set");
-                    } else if(this.route_entity.getTo_end_point_uri().equals("#Ready Set")) {
+                    if(this.route_entity.getResponse_message_entity_class() == null || this.route_entity.getResponse_message_entity_class().isEmpty()) {
+                        this.route_entity.setResponse_message_entity_class(this.package_name + ".entity." + strblocklist.get(i).replace("*", "").replace(" ", ""));
+                    } else if(this.route_entity.getTo_end_point_uri() == null || this.route_entity.getTo_end_point_uri().isEmpty()) {
                         this.route_entity.setTo_end_point_uri(strblocklist.get(i).replace("*", "").replace(" ", ""));
                     } else {
                     }

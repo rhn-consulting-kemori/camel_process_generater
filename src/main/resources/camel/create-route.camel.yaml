@@ -36,6 +36,11 @@
             description: boot-app作成
             uri: direct:create-boot-app
             parameters: {}
+        - to:
+            id: to-create-route-test-class
+            description: Routeテスト作成
+            uri: direct:create-route-test-class
+            parameters: {}
         - log:
             id: log-Complete
             description: Complete Log
@@ -334,3 +339,58 @@
         - log:
             id: log-pojo_test_class
             message: --  [Complete create Pojo Test Class] --
+- route:
+    id: route-create-route-test-class
+    from:
+      id: from-3622
+      description: Routeテスト作成
+      uri: direct:create-route-test-class
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-3908
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - to:
+            id: to-3282
+            description: テストコード作成
+            uri: bean:createRouteTestClassRule
+            parameters:
+              method: createTestClass
+        - split:
+            id: split-create-route-test-class
+            steps:
+              - setProperty:
+                  id: setProperty-route-test-className
+                  expression:
+                    simple:
+                      expression: ${body.className}
+                  name: route_test_class_name
+              - setProperty:
+                  id: setProperty-route-test-packageName
+                  expression:
+                    simple:
+                      expression: ${body.packageName}
+                  name: route_test_package_name
+              - setProperty:
+                  id: setProperty-route-test-code
+                  expression:
+                    simple:
+                      expression: ${body.javaCode}
+                  name: route_test_java_code
+              - setBody:
+                  id: setBody-route-test-code
+                  expression:
+                    simple:
+                      expression: ${exchangeProperty.route_test_java_code}
+              - to:
+                  id: to-file-route-test-code
+                  uri: file:data/output/src/test/java
+                  parameters:
+                    fileName: ${exchangeProperty.route_test_package_name}/${exchangeProperty.route_test_class_name}.java
+            expression:
+              simple: ${body}
+        - log:
+            id: log-2120
+            message: --  [Complete create Route Test Class] --
