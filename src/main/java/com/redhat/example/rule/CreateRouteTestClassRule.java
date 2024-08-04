@@ -61,6 +61,8 @@ public class CreateRouteTestClassRule {
         List<ClassYamlClassSetEntity> class_set_list = new ArrayList<ClassYamlClassSetEntity>();
         class_set_list.add(createDataProvider(entity));
         class_set_list.add(createRouteTestClass(entity));
+        class_set_list.add(createNormalTestDataSetClass(entity));
+        class_set_list.add(createErrorTestDataSetClass(entity));
         return class_set_list;
     }
 
@@ -79,6 +81,24 @@ public class CreateRouteTestClassRule {
         class_set.setClassName("RouteProcessTest");
         class_set.setPackageName(getFolderName(entity.getPackage_name() + ".route"));
         class_set.setJavaCode(createRouteTestCode(entity));
+        return class_set;
+    }
+
+    // Create Normal TestDataSetClass
+    public ClassYamlClassSetEntity createNormalTestDataSetClass(CreateRouteJsonEntity entity) {
+        ClassYamlClassSetEntity class_set = new ClassYamlClassSetEntity();
+        class_set.setClassName("RouteProcessTestNormalDataSet");
+        class_set.setPackageName(getFolderName(entity.getPackage_name() + ".route"));
+        class_set.setJavaCode(createTestDataSetCode(entity, "RouteProcessTestNormalDataSet"));
+        return class_set;
+    }
+
+    // Create Error TestDataSetClass
+    public ClassYamlClassSetEntity createErrorTestDataSetClass(CreateRouteJsonEntity entity) {
+        ClassYamlClassSetEntity class_set = new ClassYamlClassSetEntity();
+        class_set.setClassName("RouteProcessTestErrorDataSet");
+        class_set.setPackageName(getFolderName(entity.getPackage_name() + ".route"));
+        class_set.setJavaCode(createTestDataSetCode(entity, "RouteProcessTestErrorDataSet"));
         return class_set;
     }
 
@@ -144,13 +164,13 @@ public class CreateRouteTestClassRule {
         // setNormalData()
         javaCode = javaCode + "    // Normal Data\n";
         javaCode = javaCode + "    public void setNormalData() {\n\n";
-        // ----------------------------------------------------------------
+        javaCode = javaCode + "        RouteProcessTestNormalDataSet normalDataSet = new RouteProcessTestNormalDataSet();\n";
         for(Map.Entry<String, TestRouteDataUnitEntity> entry : object_map.entrySet()) {
             TestRouteDataUnitEntity obj = entry.getValue();
-            javaCode = javaCode + "        /** " + obj.getProcess_request_name() + " */\n\n";
-            javaCode = javaCode + "        /** " + obj.getProcess_response_name() + " */\n\n";
+            javaCode = javaCode + "        " + obj.getProcess_request_name() + " = normalDataSet." + getGetterName(obj.getProcess_request_name()) + ";\n";
+            javaCode = javaCode + "        " + obj.getProcess_response_name() + " = normalDataSet." + getGetterName(obj.getProcess_response_name()) + ";\n";
         }
-        // ----------------------------------------------------------------
+        javaCode = javaCode + "\n";
         javaCode = javaCode + "        /** Set Json */\n";
         javaCode = javaCode + "        setNormalJsonData();\n";
         javaCode = javaCode + "    }\n\n";
@@ -158,13 +178,13 @@ public class CreateRouteTestClassRule {
         // setErrorData()
         javaCode = javaCode + "    // Error Data\n";
         javaCode = javaCode + "    public void setErrorData() {\n\n";
-        // ----------------------------------------------------------------
+        javaCode = javaCode + "        RouteProcessTestErrorDataSet errorDataSet = new RouteProcessTestErrorDataSet();\n";
         for(Map.Entry<String, TestRouteDataUnitEntity> entry : object_map.entrySet()) {
             TestRouteDataUnitEntity obj = entry.getValue();
-            javaCode = javaCode + "        /** " + obj.getProcess_request_name() + " */\n\n";
-            javaCode = javaCode + "        /** " + obj.getProcess_response_name() + " */\n\n";
+            javaCode = javaCode + "        " + obj.getProcess_request_name() + " = errorDataSet." + getGetterName(obj.getProcess_request_name()) + ";\n";
+            javaCode = javaCode + "        " + obj.getProcess_response_name() + " = errorDataSet." + getGetterName(obj.getProcess_response_name()) + ";\n";
         }
-        // ----------------------------------------------------------------
+        javaCode = javaCode + "\n";
         javaCode = javaCode + "        /** Set Json */\n";
         javaCode = javaCode + "        setErrorJsonData();\n";
         javaCode = javaCode + "    }\n\n";
@@ -352,9 +372,10 @@ public class CreateRouteTestClassRule {
 
         // Assert Condition: Normal
         javaCode = javaCode + "    // Assert Condition: Normal\n";
+        javaCode = javaCode + "    // *** Edit Assert Condition ***\n";
         javaCode = javaCode + "    public void setNormalAssertCondition() {\n";
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
-        javaCode = javaCode + "        // Mock Direct Endpoint: Message Count\n";
+        javaCode = javaCode + "        // Mock Direct Endpoint: Expected Message Count\n";
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
         javaCode = javaCode + "        mock_direct_initial_process.expectedMessageCount(1);\n";
         for (ProcessEntity process_unit: entity.getProcess_list()){
@@ -369,6 +390,8 @@ public class CreateRouteTestClassRule {
         }
         javaCode = javaCode + "        mock_direct_finish_process.expectedMessageCount(1);\n";
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
+        javaCode = javaCode + "        // Mock Rule/API Endpoint: Expected Message Count\n";
+        javaCode = javaCode + "        // ----------------------------------------------------------------\n";
         javaCode = javaCode + "        if(!dataProvider.RULE_INTEGRATION_FLG) {\n";
         for (ProcessEntity process_unit: entity.getProcess_list()){
             if(process_unit.getProcess_type().equals("bean") || process_unit.getProcess_type().equals("bean-end")) {
@@ -382,7 +405,7 @@ public class CreateRouteTestClassRule {
             }
         }
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
-        javaCode = javaCode + "        // Set Assert Exchange Property\n";
+        javaCode = javaCode + "        // Exchange Property: Expected Data\n";
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
         javaCode = javaCode + "        mock_direct_finish_process.expectedPropertyReceived(\"process_request\", dataProvider.getRoute_request());\n";
         for (ProcessEntity process_unit: entity.getProcess_list()){
@@ -396,9 +419,10 @@ public class CreateRouteTestClassRule {
 
         // Assert Condition: Error
         javaCode = javaCode + "    // Assert Condition: Error\n";
+        javaCode = javaCode + "    // *** Edit Assert Condition ***\n";
         javaCode = javaCode + "    public void setErrorAssertCondition() {\n";
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
-        javaCode = javaCode + "        // Mock Direct Endpoint: Message Count\n";
+        javaCode = javaCode + "        // Mock Direct Endpoint: Expected Message Count\n";
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
         javaCode = javaCode + "        mock_direct_initial_process.expectedMessageCount(1);\n";
         for (ProcessEntity process_unit: entity.getProcess_list()){
@@ -413,6 +437,8 @@ public class CreateRouteTestClassRule {
         }
         javaCode = javaCode + "        mock_direct_finish_process.expectedMessageCount(1);\n";
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
+        javaCode = javaCode + "        // Mock Rule/API Endpoint: Expected Message Count\n";
+        javaCode = javaCode + "        // ----------------------------------------------------------------\n";
         javaCode = javaCode + "        if(!dataProvider.RULE_INTEGRATION_FLG) {\n";
         for (ProcessEntity process_unit: entity.getProcess_list()){
             if(process_unit.getProcess_type().equals("bean") || process_unit.getProcess_type().equals("bean-end")) {
@@ -426,7 +452,7 @@ public class CreateRouteTestClassRule {
             }
         }
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
-        javaCode = javaCode + "        // Set Assert Exchange Property\n";
+        javaCode = javaCode + "        // Exchange Property: Expected Data\n";
         javaCode = javaCode + "        // ----------------------------------------------------------------\n";
         javaCode = javaCode + "        mock_direct_finish_process.expectedPropertyReceived(\"process_request\", dataProvider.getRoute_request());\n";
         for (ProcessEntity process_unit: entity.getProcess_list()){
@@ -445,8 +471,8 @@ public class CreateRouteTestClassRule {
             if(process_unit.getProcess_type().equals("bean") || process_unit.getProcess_type().equals("bean-end")) {
                 javaCode = javaCode + "        mock_bean_" + process_unit.getProcess_name().replace("-", "_") + "_rule.whenAnyExchangeReceived(\n";
                 javaCode = javaCode + "            e -> { \n";
-                javaCode = javaCode + "                assertThat(e.getMessage().getBody(), is(dataProvider." + getGetterName(process_unit.getProcess_name().replace("-", "_")) + "));\n";
-                javaCode = javaCode + "                e.getMessage().setBody(dataProvider." + getGetterName(process_unit.getProcess_name().replace("-", "_")) + ");\n";
+                javaCode = javaCode + "                assertThat(e.getMessage().getBody(), is(dataProvider." + getGetterName(process_unit.getProcess_name().replace("-", "_") + "_request") + "));\n";
+                javaCode = javaCode + "                e.getMessage().setBody(dataProvider." + getGetterName(process_unit.getProcess_name().replace("-", "_") + "_response") + ");\n";
                 javaCode = javaCode + "            });\n";
             }
         }
@@ -473,6 +499,83 @@ public class CreateRouteTestClassRule {
         return javaCode;
     }
 
+    // Test Data Set Class
+    public String createTestDataSetCode(CreateRouteJsonEntity entity, String class_name) {
+        Map<String, TestRouteDataUnitEntity> object_map = getObject_map(entity);
+
+        String javaCode = "";
+
+        // Package
+        javaCode = javaCode + "package " + entity.getPackage_name() + ".route;\n\n";
+
+        // Import
+        /** Default */
+        javaCode = javaCode + "// Util\n";
+        for (String import_unit: defaultImportList) {
+            javaCode = javaCode + "import " + import_unit + ";\n";
+        }
+        /** Object */
+        javaCode = javaCode + "\n";
+        javaCode = javaCode + "// Business Object\n";
+        List<String> import_type_list = new ArrayList<String>();
+        for(Map.Entry<String, TestRouteDataUnitEntity> entry : object_map.entrySet()) {
+            TestRouteDataUnitEntity obj = entry.getValue();
+            if(!import_type_list.contains(obj.getProcess_request_import())) {
+                javaCode = javaCode + "import " + obj.getProcess_request_import() + ";\n";
+                import_type_list.add(obj.getProcess_request_import());
+            }
+            if(!import_type_list.contains(obj.getProcess_response_import())) {
+                javaCode = javaCode + "import " + obj.getProcess_response_import() + ";\n";
+                import_type_list.add(obj.getProcess_response_import());
+            }
+        }
+        javaCode = javaCode + "\n";
+
+        // Annnotation
+        javaCode = javaCode + "@Data\n";
+        javaCode = javaCode + "@Component\n";
+        
+        // Class Start
+        javaCode = javaCode + "public class " + class_name + " {\n\n";
+
+        // Property
+        javaCode = javaCode + "    /** Expected Object Data */\n";
+        for(Map.Entry<String, TestRouteDataUnitEntity> entry : object_map.entrySet()) {
+            TestRouteDataUnitEntity obj = entry.getValue();
+            javaCode = javaCode + "    " + obj.getProcess_request_class() + " " + obj.getProcess_request_name() + ";\n";
+            javaCode = javaCode + "    " + obj.getProcess_response_class() + " " + obj.getProcess_response_name() + ";\n";
+        }
+        javaCode = javaCode + "\n";
+        javaCode = javaCode + "    ObjectMapper mapper = new ObjectMapper();\n\n";
+
+        // Constructor
+        javaCode = javaCode + "    public " + class_name + "() {\n";
+        for(Map.Entry<String, TestRouteDataUnitEntity> entry : object_map.entrySet()) {
+            TestRouteDataUnitEntity obj = entry.getValue();
+            javaCode = javaCode + "        " + getSetterName(obj.getProcess_request_name()) + ";\n";
+            javaCode = javaCode + "        " + getSetterName(obj.getProcess_response_name()) + ";\n";
+        }
+        javaCode = javaCode + "    }\n\n";
+
+        // Setter
+        for(Map.Entry<String, TestRouteDataUnitEntity> entry : object_map.entrySet()) {
+            TestRouteDataUnitEntity obj = entry.getValue();
+            javaCode = javaCode + "    /** " + obj.getProcess_request_class() + " " + obj.getProcess_request_name() + " */\n";
+            javaCode = javaCode + "    public void " + getSetterName(obj.getProcess_request_name()) + " {\n";
+            javaCode = javaCode + "        " + obj.getProcess_request_name() + " = new " + obj.getProcess_request_class() + "();\n";
+            javaCode = javaCode + "    }\n\n";
+            javaCode = javaCode + "    /** " + obj.getProcess_response_class() + " " + obj.getProcess_response_name() + " */\n";
+            javaCode = javaCode + "    public void " + getSetterName(obj.getProcess_response_name()) + " {\n";
+            javaCode = javaCode + "        " + obj.getProcess_response_name() + " = new " + obj.getProcess_response_class() + "();\n";
+            javaCode = javaCode + "    }\n\n";
+        }
+
+        // Class End
+        javaCode = javaCode + "}\n";
+
+        return javaCode;
+    }
+
     // Get Simple Class Name
     public String getSimpleClassName(String fullClassName) {
         String[] class_part = fullClassName.split("\\.");
@@ -482,6 +585,11 @@ public class CreateRouteTestClassRule {
     // GetterName
     public String getGetterName(String property_name) {
         return "get" + property_name.substring(0, 1).toUpperCase() + property_name.substring(1) + "()";
+    }
+
+    // SetterName
+    public String getSetterName(String property_name) {
+        return "set" + property_name.substring(0, 1).toUpperCase() + property_name.substring(1) + "()";
     }
 
     // Get Route ID Name

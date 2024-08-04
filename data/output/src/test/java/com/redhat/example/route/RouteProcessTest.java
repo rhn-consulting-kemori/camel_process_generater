@@ -221,9 +221,10 @@ public class RouteProcessTest {
     }
 
     // Assert Condition: Normal
+    // *** Edit Assert Condition ***
     public void setNormalAssertCondition() {
         // ----------------------------------------------------------------
-        // Mock Direct Endpoint: Message Count
+        // Mock Direct Endpoint: Expected Message Count
         // ----------------------------------------------------------------
         mock_direct_initial_process.expectedMessageCount(1);
         mock_direct_format_check.expectedMessageCount(1);
@@ -236,6 +237,8 @@ public class RouteProcessTest {
         mock_to_kafka_service_end.expectedMessageCount(1);
         mock_direct_finish_process.expectedMessageCount(1);
         // ----------------------------------------------------------------
+        // Mock Rule/API Endpoint: Expected Message Count
+        // ----------------------------------------------------------------
         if(!dataProvider.RULE_INTEGRATION_FLG) {
             mock_bean_format_check_rule.expectedMessageCount(1);
             mock_bean_deposit_result_message_rule.expectedMessageCount(1);
@@ -246,7 +249,7 @@ public class RouteProcessTest {
         mock_http_deposit_allocation_service.expectedMessageCount(1);
         mock_http_deposit_service.expectedMessageCount(1);
         // ----------------------------------------------------------------
-        // Set Assert Exchange Property
+        // Exchange Property: Expected Data
         // ----------------------------------------------------------------
         mock_direct_finish_process.expectedPropertyReceived("process_request", dataProvider.getRoute_request());
         mock_direct_finish_process.expectedPropertyReceived("format-check_response", dataProvider.getFormat_check_response());
@@ -259,9 +262,10 @@ public class RouteProcessTest {
     }
 
     // Assert Condition: Error
+    // *** Edit Assert Condition ***
     public void setErrorAssertCondition() {
         // ----------------------------------------------------------------
-        // Mock Direct Endpoint: Message Count
+        // Mock Direct Endpoint: Expected Message Count
         // ----------------------------------------------------------------
         mock_direct_initial_process.expectedMessageCount(1);
         mock_direct_format_check.expectedMessageCount(1);
@@ -274,6 +278,8 @@ public class RouteProcessTest {
         mock_to_kafka_service_end.expectedMessageCount(1);
         mock_direct_finish_process.expectedMessageCount(1);
         // ----------------------------------------------------------------
+        // Mock Rule/API Endpoint: Expected Message Count
+        // ----------------------------------------------------------------
         if(!dataProvider.RULE_INTEGRATION_FLG) {
             mock_bean_format_check_rule.expectedMessageCount(1);
             mock_bean_deposit_result_message_rule.expectedMessageCount(1);
@@ -284,7 +290,7 @@ public class RouteProcessTest {
         mock_http_deposit_allocation_service.expectedMessageCount(1);
         mock_http_deposit_service.expectedMessageCount(1);
         // ----------------------------------------------------------------
-        // Set Assert Exchange Property
+        // Exchange Property: Expected Data
         // ----------------------------------------------------------------
         mock_direct_finish_process.expectedPropertyReceived("process_request", dataProvider.getRoute_request());
         mock_direct_finish_process.expectedPropertyReceived("format-check_response", dataProvider.getFormat_check_response());
@@ -300,13 +306,13 @@ public class RouteProcessTest {
     public void setMockBeanEndpoint() {
         mock_bean_format_check_rule.whenAnyExchangeReceived(
             e -> { 
-                assertThat(e.getMessage().getBody(), is(dataProvider.getFormat_check()));
-                e.getMessage().setBody(dataProvider.getFormat_check());
+                assertThat(e.getMessage().getBody(), is(dataProvider.getFormat_check_request()));
+                e.getMessage().setBody(dataProvider.getFormat_check_response());
             });
         mock_bean_deposit_result_message_rule.whenAnyExchangeReceived(
             e -> { 
-                assertThat(e.getMessage().getBody(), is(dataProvider.getDeposit_result_message()));
-                e.getMessage().setBody(dataProvider.getDeposit_result_message());
+                assertThat(e.getMessage().getBody(), is(dataProvider.getDeposit_result_message_request()));
+                e.getMessage().setBody(dataProvider.getDeposit_result_message_response());
             });
     }
 
