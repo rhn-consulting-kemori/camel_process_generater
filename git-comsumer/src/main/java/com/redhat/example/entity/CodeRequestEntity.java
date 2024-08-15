@@ -8,6 +8,5 @@ public class CodeRequestEntity {
     private String remote_name;
     private String repository_name;
     private String code_type;
-    private String commit_message;
     private String input_data;
 }

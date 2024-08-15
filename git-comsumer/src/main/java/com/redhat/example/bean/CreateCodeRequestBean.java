@@ -32,7 +32,7 @@ public class CreateCodeRequestBean {
         // Common items
         String activity_uml = getInputData("activity.uml");
         String business_object_yml = getInputData("business_object.yml");
-        String create_id = getCreateId();
+        String create_id = getCreateId(commit_message);
 
         List<CodeRequestEntity> requestList = new ArrayList<CodeRequestEntity>();
 
@@ -43,7 +43,6 @@ public class CreateCodeRequestBean {
             entity.setRemote_name(appConfig.getRemote_name());
             entity.setRepository_name(appConfig.getRepository_name());
             entity.setCode_type("route");
-            entity.setCommit_message(commit_message);
             entity.setInput_data(activity_uml);
             requestList.add(entity);
         }
@@ -55,7 +54,6 @@ public class CreateCodeRequestBean {
             entity.setRemote_name(appConfig.getRemote_name());
             entity.setRepository_name(appConfig.getRepository_name());
             entity.setCode_type("object");
-            entity.setCommit_message(commit_message);
             entity.setInput_data(business_object_yml);
             requestList.add(entity);
         }
@@ -77,11 +75,11 @@ public class CreateCodeRequestBean {
     }
 
     /** Get CreateId */
-    public String getCreateId() {
+    public String getCreateId(String commit_message) {
         LocalDateTime nowDate = LocalDateTime.now();
         DateTimeFormatter dtf3 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         String formatNowDate = dtf3.format(nowDate);
-        String create_id = "autocreate-" + appConfig.getRepository_name() + "-" + formatNowDate;
+        String create_id = "autocreate-" + appConfig.getRepository_name() + "-" + commit_message + "-" + formatNowDate;
         return create_id;
     }
 

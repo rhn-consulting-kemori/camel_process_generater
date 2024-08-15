@@ -8,74 +8,80 @@
         repoName: "{{app.repository_name}}"
         repoOwner: "{{app.git_user}}"
       steps:
-        - log:
-            id: log-start
-            description: start-log
-            message: -- Start --
-        - setProperty:
-            id: setProperty-commit-message
-            expression:
-              simple:
-                expression: ${body}
-            name: commit_message
-        - to:
-            id: to-folder-clean
-            description: folder-clean
-            uri: direct:folder-clean
-            parameters: {}
-        - to:
-            id: to-git-clone
-            description: git clone
-            uri: git:{{app.repository_folder}}/{{app.repository_name}}
-            parameters:
-              branchName: "{{app.branch_name}}"
-              operation: clone
-              remoteName: origin
-              remotePath: "{{app.remote_name}}"
-        - log:
-            id: log-clone
-            description: clone-log
-            message: -- git clone -> complete --
-        - setBody:
-            id: setBody-commit-message
-            expression:
-              simple:
-                expression: ${exchangeProperty.commit_message}
-        - to:
-            id: to-bean-code-create-request
-            description: create request
-            uri: bean:createCodeRequestBean
-            parameters:
-              method: createRequest
-        - log:
-            id: log-create-request
-            description: create-log
-            message: -- create request -> complete --
-        - split:
-            id: split-request-list
+        - filter:
+            id: filter-github
             steps:
-              - marshal:
-                  id: marshal-json
-                  json: {}
+              - log:
+                  id: log-start
+                  description: start-log
+                  message: -- Start --
+              - setProperty:
+                  id: setProperty-commit-message
+                  expression:
+                    simple:
+                      expression: ${body}
+                  name: commit_message
               - to:
-                  id: to-kafka
-                  uri: kafka:{{app.topic_name}}
+                  id: to-folder-clean
+                  description: folder-clean
+                  uri: direct:folder-clean
+                  parameters: {}
+              - to:
+                  id: to-git-clone
+                  description: git clone
+                  uri: git:{{app.repository_folder}}/{{app.repository_name}}
+                  parameters:
+                    branchName: "{{app.branch_name}}"
+                    operation: clone
+                    remoteName: origin
+                    remotePath: "{{app.remote_name}}"
+              - log:
+                  id: log-clone
+                  description: clone-log
+                  message: -- git clone -> complete --
+              - setBody:
+                  id: setBody-commit-message
+                  expression:
+                    simple:
+                      expression: ${exchangeProperty.commit_message}
+              - to:
+                  id: to-bean-code-create-request
+                  description: create request
+                  uri: bean:createCodeRequestBean
+                  parameters:
+                    method: createRequest
+              - log:
+                  id: log-create-request
+                  description: create-log
+                  message: -- create request -> complete --
+              - split:
+                  id: split-request-list
+                  steps:
+                    - marshal:
+                        id: marshal-json
+                        json: {}
+                    - to:
+                        id: to-kafka
+                        uri: kafka:{{app.topic_name}}
+                        parameters: {}
+                    - log:
+                        id: log-kafka
+                        description: kafka-log
+                        message: ${body}
+                  expression:
+                    simple: ${body}
+              - to:
+                  id: to-folder-clean2
+                  description: folder-clean
+                  uri: direct:folder-clean
                   parameters: {}
               - log:
-                  id: log-kafka
-                  description: kafka-log
-                  message: ${body}
+                  id: log-complete
+                  description: complete-log
+                  message: -- complete --
             expression:
-              simple: ${body}
-        - to:
-            id: to-folder-clean2
-            description: folder-clean
-            uri: direct:folder-clean
-            parameters: {}
-        - log:
-            id: log-complete
-            description: complete-log
-            message: -- complete --
+              simple:
+                expression: ${body} !contains 'autocreate'
 - route:
     id: route-folder-clean
     from:
