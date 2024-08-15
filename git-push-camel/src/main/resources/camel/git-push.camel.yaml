@@ -1,0 +1,208 @@
+- route:
+    id: route-process
+    from:
+      id: from-kafka
+      uri: kafka:{{app.topic_name}}
+      parameters: {}
+      steps:
+        - unmarshal:
+            id: unmarshal-kakfa
+            json:
+              unmarshalType: com.redhat.example.type.GitPushRequestType
+        - filter:
+            id: filter-kafka
+            steps:
+              - log:
+                  id: log-start
+                  description: start-log
+                  message: -- Start --
+              - setProperty:
+                  id: setProperty-create_id
+                  expression:
+                    simple:
+                      expression: ${body.create_id}
+                  name: create_id
+              - setProperty:
+                  id: setProperty-code_list
+                  expression:
+                    simple:
+                      expression: ${body.code_list}
+                  name: code_list
+              - to:
+                  id: to-folder-clean
+                  description: folder-clean
+                  uri: direct:folder-clean
+                  parameters: {}
+              - to:
+                  id: to-git-clone
+                  description: git clone
+                  uri: git:{{app.repository_folder}}/{{app.repository_name}}
+                  parameters:
+                    branchName: "{{app.branch_name}}"
+                    operation: clone
+                    remoteName: origin
+                    remotePath: "{{app.remote_name}}"
+              - log:
+                  id: log-clone
+                  description: clone-log
+                  message: -- git clone -> create_id=${exchangeProperty.create_id} --
+              - to:
+                  id: to-file-create
+                  description: file-create
+                  uri: direct:file-create
+                  parameters: {}
+              - to:
+                  id: to-git-add
+                  description: git add
+                  uri: direct:git-add
+                  parameters: {}
+              - to:
+                  id: to-git-commit
+                  description: git-commit
+                  uri: direct:git-commit
+                  parameters: {}
+              - to:
+                  id: to-git-push
+                  description: git-push
+                  uri: git:{{app.repository_folder}}/{{app.repository_name}}
+                  parameters:
+                    branchName: "{{app.branch_name}}"
+                    operation: push
+                    password: "{{app.git_passwd}}"
+                    remoteName: origin
+                    remotePath: "{{app.remote_name}}"
+                    username: "{{app.git_user}}"
+              - log:
+                  id: log-git-push
+                  description: push-log
+                  message: -- git push -> create_id=${exchangeProperty.create_id} --
+              - to:
+                  id: to-folder-clean2
+                  description: folder-clean
+                  uri: direct:folder-clean
+                  parameters: {}
+              - log:
+                  id: log-complete
+                  description: complete-log
+                  message: -- complete -> create_id=${exchangeProperty.create_id} --
+            simple: ${body.remote_name} == "{{app.remote_name}}"
+- route:
+    id: route-folder-clean
+    from:
+      id: from-folder-clean
+      description: folder-clean
+      uri: direct:folder-clean
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-delete-Folder
+            description: 削除フォルダ設定
+            expression:
+              simple:
+                expression: "{{app.repository_folder}}"
+        - to:
+            id: bean-folder-cleaner
+            description: Folder Cleaner
+            uri: bean:folderDeleteBean
+            parameters:
+              method: deleteFolder
+        - log:
+            id: log-folder-clean
+            description: folder-clean-log
+            message: -- folder clean -> create_id=${exchangeProperty.create_id} --
+- route:
+    id: route-file-create
+    from:
+      id: from-file-create
+      description: file-create
+      uri: direct:file-create
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-code_list
+            expression:
+              simple:
+                expression: ${exchangeProperty.code_list}
+        - split:
+            id: split-code_list
+            steps:
+              - setProperty:
+                  id: setProperty-3507
+                  expression:
+                    simple:
+                      expression: ${body.className}
+                  name: className
+              - setProperty:
+                  id: setProperty-6508
+                  expression:
+                    simple:
+                      expression: ${body.packageName}
+                  name: packageName
+              - setBody:
+                  id: setBody-code
+                  expression:
+                    simple:
+                      expression: ${body.javaCode}
+              - to:
+                  id: to-file-create-action
+                  uri: file:{{app.repository_folder}}
+                  parameters:
+                    fileName: "{{app.repository_name}}/${exchangeProperty.packageName}/${exchangePr\
+                      operty.className}"
+            expression:
+              simple: ${body}
+        - log:
+            id: log-file-create
+            message: -- file create -> create_id=${exchangeProperty.create_id} --
+- route:
+    id: route-git-add
+    from:
+      id: from-git-add
+      description: git-add
+      uri: direct:git-add
+      parameters: {}
+      steps:
+        - setHeader:
+            id: setHeader-git-add
+            description: set add file
+            expression:
+              constant:
+                expression: "."
+            name: CamelGitFilename
+        - to:
+            id: to-git-add-action
+            description: git add
+            uri: git:{{app.repository_folder}}/{{app.repository_name}}
+            parameters:
+              branchName: "{{app.branch_name}}"
+              operation: add
+        - log:
+            id: log-git-add
+            description: git-add-log
+            message: -- git add -> create_id=${exchangeProperty.create_id} --
+- route:
+    id: route-git-commit
+    from:
+      id: from-git-commit
+      description: git-commit
+      uri: direct:git-commit
+      parameters: {}
+      steps:
+        - setHeader:
+            id: setHeader-git-commit
+            description: set comment
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_id}
+            name: CamelGitCommitMessage
+        - to:
+            id: to-git-commit-action
+            description: git commit
+            uri: git:{{app.repository_folder}}/{{app.repository_name}}
+            parameters:
+              branchName: "{{app.branch_name}}"
+              operation: commit
+        - log:
+            id: log-git-commit
+            description: git-commit-log
+            message: -- git commit -> create_id=${exchangeProperty.create_id} --

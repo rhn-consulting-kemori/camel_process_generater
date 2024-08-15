@@ -1,0 +1,4 @@
+CONSUMER camel-example-input
+topic: mygitpushrequest
+partitions: 0
+from: 0

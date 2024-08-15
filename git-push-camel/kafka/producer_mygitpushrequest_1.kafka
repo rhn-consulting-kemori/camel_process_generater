@@ -1,0 +1,11 @@
+PRODUCER camel-example-kafka-PRODUCER Kafka-Pod
+topic: mygitpushrequest
+{
+    "create_id":"autocreate-gittest-20240815122349",
+    "remote_name":"https://github.com/rhn-consulting-kemori/gittest.git",
+    "code_list":[
+        {"className":"Test.java","packageName":"src/main/java/com/redhat/example","javaCode":"test1234"},
+        {"className":"TestType.java","packageName":"src/main/java/com/redhat/example/type","javaCode":"test5678"}
+    ]
+}
+###
