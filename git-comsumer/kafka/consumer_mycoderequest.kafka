@@ -1,0 +1,4 @@
+CONSUMER camel-example-input
+topic: mycoderequest
+partitions: 0
+from: 0

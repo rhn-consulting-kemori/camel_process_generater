@@ -1,0 +1,26 @@
+server:
+  port: 8190
+
+camel:
+  component:
+    kafka:
+      group-id: ${CONSUMER_GROUP:customer-exporter}
+      brokers: ${AMQS_BOOTSTRAP_SERVER:localhost:9092}
+      auto-offset-reset: earliest
+      break-on-first-error: true
+      request-required-acks: -1
+      max-in-flight-request: 5
+      enable-idempotence: true
+      retries: 2147483647
+      auto-commit-enable: false
+      allow-manual-commit: true
+
+app:
+  repository_name: ${CLONE_REPOSITORY_NAME:gittest}
+  branch_name: ${BRANCH_NAME:autocreate}
+  remote_name: ${REMOTE_NAME:https://github.com/rhn-consulting-kemori/gittest.git}
+  repository_folder: repo
+  git_user: ${GIT_USER:rhn-consulting-kemori}
+  git_passwd: ${GIT_TOKEN}
+  topic_name: ${TOPIC_NAME:mycoderequest}
+  
