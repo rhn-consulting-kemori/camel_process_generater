@@ -1,0 +1,66 @@
+- route:
+    id: #process_name#
+    from:
+      id: from-#process_name#
+      description: #process_name_japanese#
+      uri: direct:#process_name#
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-#process_name#
+            otherwise:
+              id: otherwise-#process_name#
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-#process_name#-error-skipped
+                    message: "[#process_name#] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-#process_name#
+                description: エラーなし
+                steps:
+                  - setBody:
+                      id: setBody-#process_name#-setrequest
+                      description: 依頼データ設定
+                      expression:
+                        simple:
+                          expression: #process_request_set_parameter#
+                  - bean:
+                      id: bean-#process_name#-rule
+                      description: #process_name_japanese#ルール
+                      method: #rule_method#
+                      ref: #rule_class#
+                  - setProperty:
+                      id: setProperty-#process_name#_response
+                      description: 応答結果設定
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: #process_name#_response
+                  - setProperty:
+                      id: setProperty-#process_name#-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-#process_name#-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-#process_name#-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - log:
+                      id: log-#process_name#-complete
+                      message: "[#process_name#] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0

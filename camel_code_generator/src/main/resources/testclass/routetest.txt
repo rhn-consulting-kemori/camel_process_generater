@@ -1,0 +1,52 @@
+    @Test
+    public void testRun() throws Exception {
+        
+        // Normal Test
+        testNormal();
+        MockEndpoint.resetMocks(camelContext);
+
+        // Error Test
+        testError();
+        MockEndpoint.resetMocks(camelContext);
+        
+    }
+
+    /** Normal Test */
+    public void testNormal() throws Exception {
+
+        // Given
+        dataProvider.setNormalData();
+        if(!dataProvider.RULE_INTEGRATION_FLG) {
+            setMockBeanEndpoint();
+        }
+        System.out.println("Rule Integration: " + dataProvider.RULE_INTEGRATION_FLG);
+        setMockHttpEndpoint();
+        setNormalAssertCondition();
+
+        // When
+        start.sendBody("direct:start", dataProvider.getRoute_process_json()[0]);
+
+        //Then
+        MockEndpoint.assertIsSatisfied(camelContext);
+
+    }
+
+    /** Error Test */
+    public void testError() throws Exception {
+
+        // Given
+        dataProvider.setErrorData();
+        if(!dataProvider.RULE_INTEGRATION_FLG) {
+            setMockBeanEndpoint();
+        }
+        System.out.println("Rule Integration: " + dataProvider.RULE_INTEGRATION_FLG);
+        setMockHttpEndpoint();
+        setErrorAssertCondition();
+
+        // When
+        start.sendBody("direct:start", dataProvider.getRoute_process_json()[0]);
+
+        //Then
+        MockEndpoint.assertIsSatisfied(camelContext);
+
+    }

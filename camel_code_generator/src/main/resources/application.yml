@@ -1,0 +1,20 @@
+server:
+  port: 8191
+  
+camel:
+  component:
+    kafka:
+      group-id: ${CONSUMER_GROUP:customer-exporter}
+      brokers: ${AMQS_BOOTSTRAP_SERVER:localhost:9092}
+      auto-offset-reset: earliest
+      break-on-first-error: true
+      request-required-acks: -1
+      max-in-flight-request: 5
+      enable-idempotence: true
+      retries: 2147483647
+      auto-commit-enable: false
+      allow-manual-commit: true
+
+app:
+  input_topic_name: ${TOPIC_NAME:mycoderequest}
+  output_topic_name: ${TOPIC_NAME:mygitpushrequest}

@@ -1,0 +1,8 @@
+- route:
+    id: route-process
+    from:
+      id: from-#service_name#
+      description: #service_name_japanese#
+      uri: #from_end_point_uri#
+      parameters: {}
+      steps:

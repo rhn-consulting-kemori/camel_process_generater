@@ -1,0 +1,355 @@
+- route:
+    id: route-process
+    from:
+      id: from-kafka
+      uri: kafka:{{app.input_topic_name}}
+      parameters: {}
+      steps:
+        - unmarshal:
+            id: unmarshal-kafka
+            json:
+              unmarshalType: com.redhat.example.entity.CodeRequestEntity
+        - to:
+            id: to-initial-process
+            uri: direct:initial-process
+            parameters: {}
+        - choice:
+            id: choice-3244
+            otherwise:
+              id: otherwise-code_type
+              description: else
+              steps:
+                - log:
+                    id: log-4062
+                    message: --  [Skip] -> ${exchangeProperty.create_id} -
+                      ${exchangeProperty.code_type} --
+            when:
+              - id: when-route
+                description: route
+                steps:
+                  - log:
+                      id: log-create-route-code-start
+                      message: -- [Start create Route Code] --
+                  - to:
+                      id: to-create-route-code
+                      description: create-route-code
+                      uri: direct:create-route-code
+                      parameters: {}
+                  - log:
+                      id: log-create-route-code-complete
+                      message: -- [Complete create Route Code] --
+                  - to:
+                      id: to-git-push-request-message
+                      description: git-push-request-message
+                      uri: direct:git-push-request-message
+                      parameters: {}
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.code_type} == "route"
+              - id: when-object
+                description: object
+                steps:
+                  - log:
+                      id: log-create-object-code-start
+                      message: -- [Start create Object Code] --
+                  - to:
+                      id: to-create-object-code
+                      description: create-object-code
+                      uri: direct:create-object-code
+                      parameters: {}
+                  - log:
+                      id: log-log-create-object-code-complete
+                      message: -- [Complete create Object Code] --
+                  - to:
+                      id: to-git-push-request-message2
+                      description: git-push-request-message
+                      uri: direct:git-push-request-message
+                      parameters: {}
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.code_type} == "object"
+        - log:
+            id: log-end
+            description: end-log
+            message: -- [Complete Process] --
+- route:
+    id: route-initial-process
+    from:
+      id: from-initial-process
+      description: initial-process
+      uri: direct:initial-process
+      parameters: {}
+      steps:
+        - setProperty:
+            id: setProperty-create_id
+            expression:
+              simple:
+                expression: ${body.create_id}
+            name: create_id
+        - setProperty:
+            id: setProperty-remote_name
+            expression:
+              simple:
+                expression: ${body.remote_name}
+            name: remote_name
+        - setProperty:
+            id: setProperty-repository_name
+            expression:
+              simple:
+                expression: ${body.repository_name}
+            name: repository_name
+        - setProperty:
+            id: setProperty-code_type
+            expression:
+              simple:
+                expression: ${body.code_type}
+            name: code_type
+        - setProperty:
+            id: setProperty-input_data
+            expression:
+              simple:
+                expression: ${body.input_data}
+            name: input_data
+        - log:
+            id: log-initial-process
+            message: -- [message recieved] -> ${exchangeProperty.create_id}
+              code_type=${exchangeProperty.code_type} --
+- route:
+    id: route-create-route-code
+    from:
+      id: from-create-route-code
+      description: create-route-code
+      uri: direct:create-route-code
+      parameters: {}
+      steps:
+        - to:
+            id: to-uml-json-convert
+            description: uml-json-convert
+            uri: direct:uml-json-convert
+            parameters: {}
+        - to:
+            id: to-create-route-items
+            description: create-route-items
+            uri: direct:create-route-items
+            parameters: {}
+        - to:
+            id: to-create-route-environment
+            description: create-route-environment
+            uri: direct:create-route-environment
+            parameters: {}
+- route:
+    id: route-uml-json-convert
+    from:
+      id: from-uml-json-convert
+      description: uml-json-convert
+      uri: direct:uml-json-convert
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-Uml
+            expression:
+              simple:
+                expression: ${exchangeProperty.input_data}
+        - to:
+            id: to-Json-convert
+            description: Json-Parameter変換
+            uri: bean:createJsonParameterRule
+            parameters:
+              method: createJsonParameter
+        - setProperty:
+            id: setProperty-create_route_json_entity
+            expression:
+              simple:
+                expression: ${body}
+            name: create_route_json_entity
+        - marshal:
+            id: marshal-create_route_json
+            json: {}
+        - setProperty:
+            id: setProperty-create_route_json
+            expression:
+              simple:
+                expression: ${body}
+            name: create_route_json
+        - log:
+            id: log-3503
+            message: -- [1.Convert UML to JSON] --
+- route:
+    id: route-create-route-items
+    from:
+      id: from-create-route-items
+      description: create-route-items
+      uri: direct:create-route-items
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-8040
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - bean:
+            id: bean-camel-route
+            description: Camel Route作成
+            method: createProcess
+            ref: createProcessRule
+        - setProperty:
+            id: setProperty-4199
+            expression:
+              simple:
+                expression: ${body}
+            name: camel_route
+        - log:
+            id: log-camel-route
+            message: -- [2.Create Camel Route] --
+        - setBody:
+            id: setBody-3908
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - to:
+            id: to-createRouteTestClassRule
+            description: テストコード作成
+            uri: bean:createRouteTestClassRule
+            parameters:
+              method: createTestClass
+        - setProperty:
+            id: setProperty-1776
+            expression:
+              simple:
+                expression: ${body}
+            name: route_test
+        - log:
+            id: log-2120
+            message: -- [3.Create Route Test Class] --
+- route:
+    id: route-create-route-environment
+    from:
+      id: from-create-route-environment
+      description: create-route-environment
+      uri: direct:create-route-environment
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-create-app-yml
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - bean:
+            id: bean-create-app-yml
+            description: Application-yml作成
+            method: createAppYml
+            ref: createApplicationYml
+        - setProperty:
+            id: setProperty-1936
+            expression:
+              simple:
+                expression: ${body}
+            name: application_yml
+        - log:
+            id: log-create-app-yml
+            message: -- [4.Create application.yml] --
+        - setBody:
+            id: setBody-create-pom-xml
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - bean:
+            id: bean-create-pom-xml
+            description: pom-xml作成
+            method: createPom
+            ref: createPomXml
+        - setProperty:
+            id: setProperty-2517
+            expression:
+              simple:
+                expression: ${body}
+            name: pom_xml
+        - log:
+            id: log-create-pom-xml
+            message: -- [5.Create pom.xml, Containerfile] --
+        - setBody:
+            id: setBody-create-boot-app
+            expression:
+              simple:
+                expression: ${exchangeProperty.create_route_json_entity}
+        - bean:
+            id: bean-create-boot-app
+            description: boot-app作成
+            method: createBoot
+            ref: createBootApp
+        - setProperty:
+            id: setProperty-1078
+            expression:
+              simple:
+                expression: ${body}
+            name: boot_app
+        - log:
+            id: log-create-boot-app
+            message: -- [6.Create boot-application java-file] --
+- route:
+    id: route-create-object-code
+    from:
+      id: from-create-object-code
+      uri: direct:create-object-code
+      parameters: {}
+      steps:
+        - setBody:
+            id: setBody-create-pojo-class
+            expression:
+              simple:
+                expression: ${exchangeProperty.input_data}
+        - to:
+            id: to-createPojoClassRule
+            uri: bean:createPojoClassRule
+            parameters:
+              method: createYamlClass
+        - setProperty:
+            id: setProperty-3477
+            expression:
+              simple:
+                expression: ${body}
+            name: object_class
+        - log:
+            id: log-complete-object-class
+            message: -- [1.Create Object Class] --
+        - setBody:
+            id: setBody-create-pojo-test-class
+            expression:
+              simple:
+                expression: ${exchangeProperty.input_data}
+        - to:
+            id: to-createPojoTestClassRule
+            uri: bean:createPojoTestClassRule
+            parameters:
+              method: createYamlClass
+        - setProperty:
+            id: setProperty-2765
+            expression:
+              simple:
+                expression: ${body}
+            name: object_test_class
+        - log:
+            id: log-pojo_test_class
+            message: -- [2.Create Object Test Class] --
+- route:
+    id: route-git-push-request
+    from:
+      id: from-git-push-request-message
+      description: git-push-request-message
+      uri: direct:git-push-request-message
+      parameters: {}
+      steps:
+        - process:
+            id: process-git-push-request
+            ref: "#class:com.redhat.example.processor.GitPushRequestProcessor"
+        - marshal:
+            id: marshal-git-push-request
+            json: {}
+        - to:
+            id: to-kafka
+            uri: kafka:{{app.output_topic_name}}
+            parameters: {}
+        - log:
+            id: log-kafka
+            message: -- [kafka push] -> ${exchangeProperty.create_id}
+              code_type=${exchangeProperty.code_type} --

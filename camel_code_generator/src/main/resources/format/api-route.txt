@@ -1,0 +1,88 @@
+- route:
+    id: #process_name#
+    from:
+      id: from-#process_name#
+      description: #process_name_japanese#
+      uri: direct:#process_name#
+      parameters: {}
+      steps:
+        - choice:
+            id: choice-#process_name#
+            otherwise:
+              id: otherwise-#process_name#
+              description: エラーあり
+              steps:
+                - log:
+                    id: log-#process_name#-error-skipped
+                    message: "[#process_name#] - (${exchangeProperty.process_request.request_id}) - skipped"
+            when:
+              - id: when-#process_name#
+                description: エラーなし
+                steps:
+                  - setBody:
+                      id: setBody-#process_name#-setrequest
+                      description: #process_name_japanese#要求設定
+                      expression:
+                        simple:
+                          expression: #process_request_set_parameter#
+                  - to:
+                      id: to-#process_name#-service
+                      description: #process_name_japanese#サービス
+                      uri: #http_url#
+                      parameters:
+                        httpMethod: #http_method#
+                  - unmarshal:
+                      id: unmarshal-#process_name#-response
+                      description: json->java変換
+                      json:
+                        unmarshalType: #response_entity_class#
+                  - setProperty:
+                      id: setProperty-#process_name#-response
+                      description: HTTP結果設定
+                      expression:
+                        simple:
+                          expression: ${body.#business_data#}
+                      name: #business_data#
+                  - setProperty:
+                      id: setProperty-#process_name#-process_result
+                      description: 結果設定
+                      expression:
+                        simple:
+                          expression: ${body.response_result}
+                      name: process_result
+                  - setProperty:
+                      id: setProperty-#process_name#-err_code
+                      description: エラーコード設定
+                      expression:
+                        simple:
+                          expression: ${body.err_code}
+                      name: err_code
+                  - setProperty:
+                      id: setProperty-#process_name#-err_context
+                      description: エラー内容設定
+                      expression:
+                        simple:
+                          expression: ${body.err_context}
+                      name: err_context
+                  - setBody:
+                      id: setBody-#process_name#-#business_data#
+                      description: #process_name_japanese#結果
+                      expression:
+                        simple:
+                          expression: ${exchangeProperty.#business_data#}
+                  - marshal:
+                      description: Class→JSON変換
+                      json: {}
+                  - setProperty:
+                      id: setProperty-#process_name#-#business_data#
+                      description: #process_name_japanese#結果設定-Json
+                      expression:
+                        simple:
+                          expression: ${body}
+                      name: #business_data#_json
+                  - log:
+                      id: log-#process_name#-complete
+                      message: "[#process_name#] - (${exchangeProperty.process_request.request_id}) - result: ${exchangeProperty.process_result} - err_code: ${exchangeProperty.err_code} - err_context: ${exchangeProperty.err_context}"
+                expression:
+                  simple:
+                    expression: ${exchangeProperty.process_result} == 0
