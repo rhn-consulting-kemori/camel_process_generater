@@ -47,6 +47,7 @@ public class GitPushRequestProcessor implements Processor {
             /** application.yaml */
             String application_yml = exchange.getProperty("application_yml", String.class);
             code_list.add(setStringEntity("application.yaml", "src/main/resources", application_yml));
+            code_list.add(setStringEntity("application.yaml", "src/test/resources", application_yml));
 
             /** CamelBootApplication.java */
             ClassYamlClassSetEntity boot_app = exchange.getProperty("boot_app", ClassYamlClassSetEntity.class);

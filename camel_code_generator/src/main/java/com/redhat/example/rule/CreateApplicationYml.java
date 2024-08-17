@@ -59,7 +59,7 @@ public class CreateApplicationYml {
         }
         
         for (String parameter_obj : parameterList) {
-            appymlstr = appymlstr + "  " + parameter_obj + ": \"\"\n";
+            appymlstr = appymlstr + "  " + parameter_obj + ": ${" + parameter_obj.replace("-", "_").toUpperCase() + "}\n";
         }
 
         return appymlstr;
@@ -113,4 +113,5 @@ public class CreateApplicationYml {
             }
         }
     }
+
 }
