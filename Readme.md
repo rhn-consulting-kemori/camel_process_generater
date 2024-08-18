@@ -19,4 +19,4 @@
 * cd git_consumer
 * mvn package
 * podman build -t git_consumer .
-* podman run -d --pod camel-process-gen-pod -e CLONE_REPOSITORY_NAME="@" -e REMOTE_NAME="@" -e GIT_USER="@" -e GIT_TOKEN="@" -e TOPIC_NAME="@" --name git_consumer git_consumer
+* podman run -d --pod camel-process-gen-pod -e CLONE_REPOSITORY_NAME="@" -e REMOTE_NAME="@" -e GIT_USER="@" -e GIT_TOKEN="@" -e TOPIC_NAME="@" -e REPOSITORY_FOLDER="/opt/repo" --name git_consumer git_consumer
