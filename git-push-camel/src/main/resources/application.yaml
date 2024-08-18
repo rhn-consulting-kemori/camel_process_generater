@@ -16,7 +16,7 @@ camel:
       allow-manual-commit: true
 
 app:
-  repository_folder: repo
+  repository_folder: ${REPOSITORY_FOLDER:repo}
   repository_name: ${REPOSITORY_NAME:gittest}
   remote_name: ${REMOTE_NAME:https://github.com/rhn-consulting-kemori/gittest.git}
   branch_name: ${BRANCH_NAME:autocreate}
