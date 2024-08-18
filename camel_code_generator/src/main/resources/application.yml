@@ -16,5 +16,5 @@ camel:
       allow-manual-commit: true
 
 app:
-  input_topic_name: ${TOPIC_NAME:mycoderequest}
-  output_topic_name: ${TOPIC_NAME:mygitpushrequest}
+  input_topic_name: ${INPUT_TOPIC_NAME:mycoderequest}
+  output_topic_name: ${OUTPUT_TOPIC_NAME:mygitpushrequest}
