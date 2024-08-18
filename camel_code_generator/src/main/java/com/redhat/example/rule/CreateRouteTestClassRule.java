@@ -14,15 +14,20 @@ import java.util.regex.Pattern;
 // Spring
 import org.springframework.stereotype.Component;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 // Business Object
 import com.redhat.example.entity.CreateRouteJsonEntity;
 import com.redhat.example.entity.ProcessEntity;
 import com.redhat.example.entity.ClassYamlClassSetEntity;
 import com.redhat.example.entity.TestRouteDataUnitEntity;
+import com.redhat.example.config.AppConfig;
 
 @Component
 public class CreateRouteTestClassRule {
+    // Config
+    @Autowired
+    private AppConfig appConfig;
 
     // Default Import
     String[] defaultImportList = {
@@ -52,12 +57,13 @@ public class CreateRouteTestClassRule {
     };
 
     // Format
-    private String FORMATPATH = "src/main/resources/testclass/";
+    private String FORMATPATH;
     private String FORMATFILENAME = "routetest.txt";
     private String class_format;
 
     // Create Route Test Class
     public List<ClassYamlClassSetEntity> createTestClass(CreateRouteJsonEntity entity) {
+        FORMATPATH = appConfig.getFormat_root_path() + "/testclass/";
         List<ClassYamlClassSetEntity> class_set_list = new ArrayList<ClassYamlClassSetEntity>();
         class_set_list.add(createDataProvider(entity));
         class_set_list.add(createRouteTestClass(entity));

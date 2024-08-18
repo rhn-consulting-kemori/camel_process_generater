@@ -13,18 +13,23 @@ import java.util.regex.Pattern;
 
 // Spring
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 // Business Object
 import com.redhat.example.entity.ClassYamlCompEntity;
 import com.redhat.example.entity.ClassYamlUnitEntity;
 import com.redhat.example.entity.ClassYamlPropertyEntity;
 import com.redhat.example.entity.ClassYamlClassSetEntity;
+import com.redhat.example.config.AppConfig;
 
 @Component
 public class CreatePojoTestClassRule {
+    // Config
+    @Autowired
+    private AppConfig appConfig;
 
     // Format
-    private String FORMATPATH = "src/main/resources/testclass/";
+    private String FORMATPATH;
     private String FORMATFILENAME = "pojo.txt";
     private String class_format;
 
@@ -48,6 +53,7 @@ public class CreatePojoTestClassRule {
     public List<ClassYamlClassSetEntity> createYamlClass(String entity_yaml) {
 
         // Format
+        FORMATPATH = appConfig.getFormat_root_path() + "/testclass/";
         getClassFormat();
 
         // List

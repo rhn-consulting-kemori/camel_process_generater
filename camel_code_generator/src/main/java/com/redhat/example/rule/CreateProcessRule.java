@@ -11,21 +11,27 @@ import java.util.Map;
 // Spring
 import org.springframework.stereotype.Component;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 // Business Object
 import com.redhat.example.entity.CreateRouteJsonEntity;
 import com.redhat.example.entity.ProcessEntity;
+import com.redhat.example.config.AppConfig;
 
 @Component
 public class CreateProcessRule {
-    
+    // Config
+    @Autowired
+    private AppConfig appConfig;
+
     // Test Path
-    private String FORMATPATH = "src/main/resources/format/";
+    private String FORMATPATH;
 
     // Create Process
     public String createProcess(CreateRouteJsonEntity entity) {
         
         // Format set
+        FORMATPATH = appConfig.getFormat_root_path() + "/route/";
         Map<String, String> format_map = getFormat();
 
         // Create

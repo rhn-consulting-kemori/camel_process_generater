@@ -9,12 +9,12 @@
 * cd git_push_camel
 * mvn package
 * podman build -t git_push_camel .
-* podman run -d --pod camel-process-gen-pod -e REPOSITORY_NAME="@" -e REMOTE_NAME="@" -e GIT_USER="@" -e GIT_TOKEN="@" -e TOPIC_NAME="@" --name git_push_camel git_push_camel
+* podman run -d --pod camel-process-gen-pod -e REPOSITORY_NAME="@" -e REMOTE_NAME="@" -e GIT_USER="@" -e GIT_TOKEN="@" -e TOPIC_NAME="@" -e REPOSITORY_FOLDER="/opt/repo" --name git_push_camel git_push_camel
 ### camel_code_generator
 * cd camel_code_generator
 * mvn package
 * podman build -t camel_code_generator .
-* podman run -d --pod camel-process-gen-pod -e INPUT_TOPIC_NAME="@" -e OUTPUT_TOPIC_NAME="@" --name camel_code_generator camel_code_generator
+* podman run -d --pod camel-process-gen-pod -e INPUT_TOPIC_NAME="@" -e OUTPUT_TOPIC_NAME="@" -e FORMAT_ROOT_PATH="/opt/format" --name camel_code_generator camel_code_generator
 ### git_consumer
 * cd git_consumer
 * mvn package

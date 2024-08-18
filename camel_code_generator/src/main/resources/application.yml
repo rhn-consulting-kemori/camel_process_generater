@@ -18,3 +18,4 @@ camel:
 app:
   input_topic_name: ${INPUT_TOPIC_NAME:mycoderequest}
   output_topic_name: ${OUTPUT_TOPIC_NAME:mygitpushrequest}
+  format_root_path: ${FORMAT_ROOT_PATH:format}

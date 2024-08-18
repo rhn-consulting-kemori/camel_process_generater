@@ -11,15 +11,21 @@ import java.nio.file.Paths;
 // Spring
 import org.springframework.stereotype.Component;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 // Business Object
 import com.redhat.example.entity.CreateRouteJsonEntity;
 import com.redhat.example.entity.ProcessEntity;
+import com.redhat.example.config.AppConfig;
 
 @Component
 public class CreateApplicationYml {
+    // Config
+    @Autowired
+    private AppConfig appConfig;
+
     // Path
-    private String FORMATPATH = "src/main/resources/appenv/";
+    private String FORMATPATH;
 
     // Format
     private String server_format;
@@ -30,6 +36,7 @@ public class CreateApplicationYml {
 
     // Create Application YML
     public String createAppYml(CreateRouteJsonEntity entity) {
+        FORMATPATH = appConfig.getFormat_root_path() + "/appenv/";
         setFormat();
 
         // Server
