@@ -1,0 +1,43 @@
+{
+  "groups": [
+    {
+      "name": "app",
+      "type": "com.redhat.example.config.AppConfig",
+      "sourceType": "com.redhat.example.config.AppConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "app.branch-name",
+      "type": "java.lang.String",
+      "sourceType": "com.redhat.example.config.AppConfig"
+    },
+    {
+      "name": "app.git-passwd",
+      "type": "java.lang.String",
+      "sourceType": "com.redhat.example.config.AppConfig"
+    },
+    {
+      "name": "app.git-user",
+      "type": "java.lang.String",
+      "sourceType": "com.redhat.example.config.AppConfig"
+    },
+    {
+      "name": "app.remote-name",
+      "type": "java.lang.String",
+      "sourceType": "com.redhat.example.config.AppConfig"
+    },
+    {
+      "name": "app.repository-folder",
+      "type": "java.lang.String",
+      "sourceType": "com.redhat.example.config.AppConfig"
+    },
+    {
+      "name": "app.repository-name",
+      "type": "java.lang.String",
+      "description": "Config Parameter",
+      "sourceType": "com.redhat.example.config.AppConfig"
+    }
+  ],
+  "hints": []
+}
